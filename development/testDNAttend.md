@@ -14,24 +14,22 @@ jupyter:
 ---
 
 ```python
+%matplotlib inline
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from dnattend.data import generateData
 from dnattend.train import trainModel, splitData
+from dnattend.test import getFeatureImportances, plotRocCurve
 ```
 
 ```python
-data = generateData(size=100_000, seed=42)
-X = data.copy()
-y = X.pop('status')
+df = generateData(size=10_000, seed=42)
 ```
 
 ```python
-X_train, X_test, X_val, y_train, y_test, y_val = (
-    splitData(X, y, train_size=0.7, test_size=0.15, val_size=0.15)
-)
+data = splitData(df, target='status', train_size=0.7, test_size=0.15, val_size=0.15)
 ```
 
 ```python
@@ -49,11 +47,20 @@ trainingParams = ({
 ```
 
 ```python
-model, params = trainModel(X_train, y_train, X_val, y_val, **trainingParams)
+model, params = trainModel(data, **trainingParams)
 ```
 
 ```python
-from sklearn.metrics import roc_curve, roc_auc_score, classification_report, RocCurveDisplay
+featureImportances = getFeatureImportances(model)
+featureImportances.plot.barh()
+```
+
+```python
+fig, ax = plotRocCurve(model, data)
+```
+
+```python
+from sklearn.metrics import classification_report
 ```
 
 ```python
@@ -66,41 +73,6 @@ def predict(model, X, threshold=0.5):
 ```
 
 ```python
-y_trainInt = y_train.apply(lambda x: 1 if x == model.classes_[1] else 0)
-y_predPos = model.predict_proba(X_train)[:,1]
-
-fpr, tpr, thresholds = roc_curve(
-    y_trainInt, y_predPos, drop_intermediate=False)
-AUC = roc_auc_score(y_trainInt, y_predPos)
-
-idx = np.argmin(np.abs(fpr + tpr - 1))
-optimalThreshold = thresholds[idx]
-```
-
-```python
-fig, ax = plt.subplots()
-RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax)
-ax.set_xlim([0, 1])
-ax.set_ylim([0, 1])
-ax.axhline(tpr[idx], xmax=fpr[idx], ls='--', alpha=0.5, c='black')
-ax.axvline(fpr[idx], ymax=tpr[idx], ls='--', alpha=0.5, c='black')
-ax.scatter(fpr[idx], tpr[idx], c='black')
-ax.set_xlabel('False Positive Rate')
-ax.set_ylabel('True Positive Rate')
-label = f'AUC = {AUC:.2f}, Optimal Threshold = {optimalThreshold:.2f}'
-ax.legend(labels=[label], loc='lower right')
-fig.show()
-```
-
-```python
-importances = pd.Series(
-    model.named_steps['estimator'].feature_importances_,
-    model.named_steps['preprocess'].named_steps['prepare'].validCols
-).sort_values(ascending=False)
-importances
-```
-
-```python
 predictions = predict(model, X_test, threshold=optimalThreshold)
 report = classification_report(y_test, predictions['class'], output_dict=True)
 ```
@@ -110,7 +82,7 @@ report
 ```
 
 ```python
-data[['Attend', 'DNA', 'class']] = predict(model, data, threshold=optimalThreshold)
+data[['Attend'), ('probability', 'DNA'), 'class']] = predict(model, data, threshold=optimalThreshold)
 ```
 
 ```python

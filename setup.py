@@ -38,7 +38,8 @@ setup(
         'scipy',
         'numpy',
         'pandas',
-        'catboost'
+        'seaborn',
+        'catboost',
         'matplotlib',
         'scikit-learn',
     ],
