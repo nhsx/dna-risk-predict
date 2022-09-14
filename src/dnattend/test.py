@@ -5,10 +5,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve, roc_auc_score, RocCurveDisplay
 
 
-def getFeatureImportances(model):
+def getFeatureImportance(model):
     importances = pd.Series(
         model.named_steps['estimator'].feature_importances_,
         model.named_steps['preprocess'].named_steps['prepare'].validCols
@@ -23,7 +24,7 @@ def _processTestData(model, data):
     return y_test, test_pred_proba
 
 
-def plotRocCurve(model, data):
+def plotROC(model, data):
     y_test, test_pred_proba = _processTestData(model, data)
     AUC = roc_auc_score(y_test, test_pred_proba)
     fpr, tpr, thresholds = roc_curve(
@@ -45,3 +46,25 @@ def plotRocCurve(model, data):
     label = f'AUC = {AUC:.2f}, {posClass} Threshold = {threshold:.2f}'
     ax.legend(labels=[label], loc='lower right')
     return fig, ax
+
+
+def predict(model, X):
+    """ Generate predictions using trained model """
+    try:
+        param = 'preprocess__prepare__decisionThreshold'
+        threshold = model.get_params()[param]
+    except KeyError:
+        threshold = 0.5
+    classes = model.classes_
+    out = pd.DataFrame(model.predict_proba(X), columns=classes)
+    out['class'] = out[classes[1]].apply(
+        lambda x: classes[0] if x < threshold else classes[1])
+    return out
+
+
+def evaluate(model, data):
+    """ Generate classification report using test data """
+    predictions = predict(model, data['X_test'])
+    report = classification_report(
+        data['y_test'], predictions['class'], output_dict=True)
+    return report

@@ -40,39 +40,15 @@ def splitData(
     })
 
 
-def trainModel(
-        data: dict,
-        catCols: list = None,
-        numericCols: list = None,
-        boolCols: list = None,
-        cvFolds: int = 5,
-        catboostIterations: int = 100,
-        hypertuneIterations: int = 5,
-        evalIterations: int = 10000,
-        earlyStoppingRounds: int = 10,
-        params: dict = None,
-        seed: int = 42,
-        verbose: int = 0,
-        nJobs: int = 1):
-
-    np.random.seed(seed)
-    
-    if (params is None) or (not isinstance(params, dict)):
-        params = ({
-            'estimator__depth':           randint(4, 10),
-            'estimator__l2_leaf_reg':     randint(2, 10),
-            'estimator__random_strength': uniform.rvs(0, 10, size=100),
-        })
-
-    if (catCols is None) and (numericCols is None) and (boolCols is None):
-        raise ValueError('No features provided.')
-
+def _getClassWeights(y):
     # Set class weight to balanced probalities for more easy interpretation
-    classes = np.unique(data['y_train'])
+    classes = np.unique(y)
     weights = compute_class_weight(
-        class_weight='balanced', classes=classes, y=data['y_train'])
-    class_weights = dict(zip(classes, weights))
+        class_weight='balanced', classes=classes, y=y)
+    return  dict(zip(classes, weights))
 
+
+def _buildPreProcessor(catCols, numericCols, boolCols):
     transformers = ([
         ('categories', SimpleImputer(strategy='constant'), catCols),
         ('numeric',    SimpleImputer(strategy='mean'), numericCols),
@@ -85,6 +61,38 @@ def trainModel(
         ('prepare',         utils._prepareData(catCols, numericCols, boolCols)),
         ('columnTransform', featureTransformer),
     ])
+    return preProcessor
+
+
+def trainModel(
+        data: dict,
+        catCols: list = None,
+        numericCols: list = None,
+        boolCols: list = None,
+        cvFolds: int = 5,
+        catboostIterations: int = 100,
+        hypertuneIterations: int = 5,
+        evalIterations: int = 10000,
+        earlyStoppingRounds: int = 10,
+        hyperParams: dict = None,
+        seed: int = 42,
+        verbose: int = 0,
+        nJobs: int = 1):
+
+    np.random.seed(seed)
+
+    if (hyperParams is None) or (not isinstance(hyperParams, dict)):
+        hyperParams = ({
+            'estimator__depth':           randint(4, 10),
+            'estimator__l2_leaf_reg':     randint(2, 10),
+            'estimator__random_strength': uniform.rvs(0, 10, size=100),
+        })
+
+    if (catCols is None) and (numericCols is None) and (boolCols is None):
+        raise ValueError('No features provided.')
+
+    class_weights = _getClassWeights(data['y_train'])
+    preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
 
     # Combine processor and modelling steps into a Pipeline object
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
@@ -99,7 +107,7 @@ def trainModel(
     ])
 
     gridSearch = RandomizedSearchCV(
-        model, params, scoring='neg_log_loss',
+        model, hyperParams, scoring='neg_log_loss',
         random_state=np.random.randint(1e9), cv=cvFolds,
         refit=False, n_jobs=nJobs, n_iter=hypertuneIterations, verbose=verbose)
     _ = gridSearch.fit(data['X_train'], data['y_train'])
@@ -127,6 +135,38 @@ def trainModel(
     # Tune decision threshold to balance FPR and TPR
     threshold = utils._tuneThreshold(model, data['X_train'], data['y_train'])
     params['preprocess__prepare__decisionThreshold'] = threshold
-    _ = model.set_params(preprocess__prepare__decisionThreshold = threshold)
+    _ = model.set_params(
+        preprocess__prepare__decisionThreshold=threshold,
+    )
 
     return model, params
+
+
+def _rebuildPipeline(model):
+    """ Rebuild unbuilt pipeline """
+    seed = model.get_params()['estimator__random_seed']
+    class_weights = model.get_params()['estimator__class_weights']
+    catCols = model.get_params()['preprocess__prepare__catCols']
+    numericCols = model.get_params()['preprocess__prepare__numericCols']
+    boolCols = model.get_params()['preprocess__prepare__boolCols']
+    preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
+    catColIdx = preProcessor.named_steps['prepare'].catColIdx
+    model = Pipeline(steps=[
+        ('preprocess',     preProcessor),
+        ('estimator',      CatBoostClassifier(
+            cat_features=catColIdx, eval_metric='Logloss',
+            class_weights=class_weights, verbose=0,
+            random_seed=seed)),
+    ])
+    return model
+
+
+def refitAllData(model, params, data):
+    """ Perform final refit with full data """
+    model = _rebuildPipeline(model)
+    _ = model.set_params(**params)
+    model.fit(
+        pd.concat([data['X_train'], data['X_test'], data['X_val']]),
+        pd.concat([data['y_train'], data['y_test'], data['y_val']])
+    )
+    return model
