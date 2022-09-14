@@ -10,6 +10,13 @@
     * [Generate Example Data](#generate-example-data)
     * [Split Data (Test, Train, Validation)](#split-data-test-train-validation)
     * [Train Model](#train-model)
+    * [Evaluate Model](#evaluate-model)
+      * [Feature Importance](#feature-importance)
+      * [ROC Curve](#roc-curve)
+      * [Evaluation Report](#evaluation-report)
+    * [Re-fit model with all data](#re-fit-model-with-all-data)
+    * [Generate Predictions](#generate-predictions)
+
 
 ## Installation
 
@@ -30,20 +37,20 @@ from dnattend.train import trainModel, splitData, refitAllData
 from dnattend.test import getFeatureImportance, plotROC, predict, evaluate
 ```
 
-#### Generate Example Data
+### Generate Example Data
 
 ```python
 # Randomly generate some artificial attendance data
 df = generateData(size=50_000, seed=42)
 ```
 
-#### Split Data (Test, Train, Validation)
+### Split Data (Test, Train, Validation)
 
 ```python
 data = splitData(df, target='status', train_size=0.7, test_size=0.15, val_size=0.15)
 ```
 
-#### Train Model
+### Train Model
 
 ```python
 catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
@@ -78,9 +85,9 @@ model, params = trainModel(data, hyperParams=hyperParams, **trainingParams)
 
 ![model](./README_files/modelWorkflow.svg)
 
-#### Evaluate Model
+### Evaluate Model
 
-##### Feature Importance
+#### Feature Importance
 
 ```python
 featureImportances = getFeatureImportance(model)
@@ -91,7 +98,7 @@ fig.figure.savefig('featureImportances.png')
 ![featureImporance](./README_files/featureImportances.svg)
 
 
-##### ROC Curve
+#### ROC Curve
 
 ```python
 fig, ax = plotROC(model, data)
@@ -101,7 +108,7 @@ fig.figure.savefig('ROCcurve.svg')
 
 ![ROC](./README_files/ROCcurve.svg)
 
-##### Evaluation Report
+#### Evaluation Report
 
 ```python
 report = evaluate(model, data)
@@ -136,13 +143,13 @@ print(report)
 }
 ```
 
-##### Re-fit model with all data
+### Re-fit model with all data
 
 ```python
 model = refitAllData(model, params, data)
 ```
 
-##### Generate predictions
+### Generate Predictions
 
 ```python
 df[['Attend', 'DNA', 'class']] = predict(model, df)
