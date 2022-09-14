@@ -16,6 +16,7 @@
       * [Evaluation Report](#evaluation-report)
     * [Re-fit model with all data](#re-fit-model-with-all-data)
     * [Generate Predictions](#generate-predictions)
+  * [Contact](#contact)
 
 
 ## Installation
@@ -154,3 +155,8 @@ model = refitAllData(model, params, data)
 ```python
 df[['Attend', 'DNA', 'class']] = predict(model, df)
 ```
+
+## Contact
+
+**[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
+, :envelope: stephen.richer@proton.me
