@@ -15,17 +15,15 @@ jupyter:
 
 ```python
 %matplotlib inline
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+from sklearn.base import clone
+from scipy.stats import randint, uniform
 from dnattend.data import generateData
-from dnattend.train import trainModel, splitData
-from dnattend.test import getFeatureImportances, plotRocCurve
+from dnattend.train import trainModel, splitData, refitAllData
+from dnattend.test import getFeatureImportance, plotROC, predict, evaluate
 ```
 
 ```python
-df = generateData(size=10_000, seed=42)
+df = generateData(size=50_000, seed=42)
 ```
 
 ```python
@@ -33,60 +31,56 @@ data = splitData(df, target='status', train_size=0.7, test_size=0.15, val_size=0
 ```
 
 ```python
+catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
+boolCols = ['firstAppointment']
+numericCols = ['age']
+
 trainingParams = ({
-    'catCols': ['day', 'priority', 'speciality', 'consultationMedia', 'site'],
-    'boolCols': ['firstAppointment'],
-    'numericCols': ['age'],
-    'cvFolds': 5,
-    'catboostIterations': 100,
+    'catCols':             catCols,
+    'boolCols':            boolCols,
+    'numericCols':         numericCols,
+    'cvFolds':             5,
+    'catboostIterations':  100,
     'hypertuneIterations': 5,
-    'evalIterations': 10_000,
+    'evalIterations':      10_000,
     'earlyStoppingRounds': 10,
-    'seed': 42 
+    'seed':                42 
 })
+
+hyperParams = ({
+    'estimator__depth':           randint(4, 10),
+    'estimator__l2_leaf_reg':     randint(2, 10),
+    'estimator__random_strength': uniform.rvs(0, 10, size=100),
+})
+
+model, params = trainModel(data, hyperParams=hyperParams, **trainingParams)
 ```
 
 ```python
-model, params = trainModel(data, **trainingParams)
+oldParams = model.get_params()
 ```
 
 ```python
-featureImportances = getFeatureImportances(model)
-featureImportances.plot.barh()
+featureImportances = getFeatureImportance(model)
+fig = featureImportances.plot.barh()
+fig.figure.savefig('../README_files/featureImportances.svg', dpi=300)
 ```
 
 ```python
-fig, ax = plotRocCurve(model, data)
+fig, ax = plotROC(model, data)
+fig.figure.savefig('../README_files/ROCcurve.svg', dpi=300)
 ```
 
 ```python
-from sklearn.metrics import classification_report
+report = evaluate(model, data)
 ```
 
 ```python
-def predict(model, X, threshold=0.5):
-    classes = model.classes_
-    out = pd.DataFrame(model.predict_proba(X), columns=classes)
-    out['class'] = out[classes[1]].apply(
-        lambda x: classes[0] if x < threshold else classes[1])
-    return out
+model = refitAllData(model, params, data)
 ```
 
 ```python
-predictions = predict(model, X_test, threshold=optimalThreshold)
-report = classification_report(y_test, predictions['class'], output_dict=True)
-```
-
-```python
-report
-```
-
-```python
-data[['Attend'), ('probability', 'DNA'), 'class']] = predict(model, data, threshold=optimalThreshold)
-```
-
-```python
-data
+df[['Attend', 'DNA', 'class']] = predict(model, df)
 ```
 
 ```python

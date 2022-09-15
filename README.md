@@ -32,6 +32,7 @@ pip install git+https://github.com/nhsx/dna-risk-predict.git
 ## Worklow
 
 ![workflow](./README_files/DNApredictFlowchart.svg)
+ <br> *Overview of DNAttend workflow*
 
 ## Usage
 
@@ -89,6 +90,7 @@ model, params = trainModel(data, hyperParams=hyperParams, **trainingParams)
 ```
 
 ![model](./README_files/modelWorkflow.svg)
+ <br> *Summary of scikit-learn Pipeline*
 
 ### Evaluate Model
 
@@ -114,6 +116,7 @@ fig.figure.savefig('ROCcurve.svg')
 ![ROC](./README_files/ROCcurve.svg)
 
 #### Evaluation Report
+The `evaluate()` function computes a comprehensive set of performance metrics using the `test` data.
 
 ```python
 report = evaluate(model, data)
@@ -150,12 +153,17 @@ print(report)
 ```
 
 ### Re-fit model with all data
+Following parameterisation and validation the `refitAllData()` function can be used to refit a new model on the whole data set.
 
 ```python
 model = refitAllData(model, params, data)
 ```
 
 ### Generate Predictions
+The trained model is now ready to be used.
+Predictions should be made with the `predict()` wrapper function - this ensures the tuned decision threshold is correct applied when assigning classes.
+The output of `predict()` includes the decision class (i.e.`Attend` and `DNA`) and the underlying probabilities of theses classes.
+The output results of this example can be found [here](./README_files/example-data-predictions.csv)
 
 ```python
 df[['Attend', 'DNA', 'class']] = predict(model, df)
