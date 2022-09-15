@@ -102,6 +102,7 @@ def trainModel(
             cat_features=catColIdx,
             eval_metric='Logloss',
             class_weights=class_weights,
+            allow_writing_files=False,
             iterations=catboostIterations, verbose=verbose,
             random_seed=np.random.randint(1e9))),
     ])
@@ -156,7 +157,7 @@ def _rebuildPipeline(model):
         ('estimator',      CatBoostClassifier(
             cat_features=catColIdx, eval_metric='Logloss',
             class_weights=class_weights, verbose=0,
-            random_seed=seed)),
+            random_seed=seed, allow_writing_files=False)),
     ])
     return model
 
