@@ -2,6 +2,8 @@
 
 ## Train, test and validate a CatBoost Classifier for predicting patient non-attendance (DNA)
 
+[![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
+
 ## Table of contents
 
   * [Installation](#installation)
@@ -15,7 +17,9 @@
       * [ROC Curve](#roc-curve)
       * [Evaluation Report](#evaluation-report)
     * [Re-fit model with all data](#re-fit-model-with-all-data)
-    * [Generate Predictions](#generate-predictions)
+  * [Generate Predictions](#generate-predictions)
+  * [Contributing](#contributing)
+  * [License](#license)
   * [Contact](#contact)
 
 
@@ -156,7 +160,21 @@ model = refitAllData(model, params, data)
 df[['Attend', 'DNA', 'class']] = predict(model, df)
 ```
 
-## Contact
+### Contributing
 
-**[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
-, :envelope: stephen.richer@proton.me
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### License
+
+Distributed under the MIT License. _See [LICENSE](./LICENSE) for more information._
+
+### Contact
+
+If you have any other questions please contact the author **[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
+at stephen.richer@proton.me
