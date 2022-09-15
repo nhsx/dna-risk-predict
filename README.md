@@ -121,31 +121,32 @@ report = evaluate(model, data)
 print(report)
 {
     'Attend': {
-        'precision': 0.7905064969504111,
-        'recall':    0.8069842988630211,
-        'f1-score':  0.798660415271266,
-        'support':   3694
+        'precision': 0.7976354138025845,
+        'recall':    0.7815193965517241,
+        'f1-score':  0.7894951694108042,
+        'support':   3712
     },
     'DNA': {
-        'precision': 0.8088471849865951,
-        'recall':    0.7924875229839768,
-        'f1-score':  0.8005837866525143,
-        'support':   3807
+        'precision': 0.7901138716356108,
+        'recall':    0.8057534969648984,
+        'f1-score':  0.7978570495230629,
+        'support':   3789
     },
-    'accuracy':      0.7996267164378082,
+    'accuracy':      0.7937608318890814,
     'macro avg': {
-        'precision': 0.7996768409685031,
-        'recall':    0.7997359109234989,
-        'f1-score':  0.7996221009618901,
+        'precision': 0.7938746427190977,
+        'recall':    0.7936364467583112,
+        'f1-score':  0.7936761094669336,
         'support':   7501
     },
     'weighted avg': {
-        'precision': 0.7998149890652961,
-        'recall':    0.7996267164378082,
-        'f1-score':  0.7996365884279668,
+        'precision': 0.7938360372833652,
+        'recall':    0.7937608318890814,
+        'f1-score':  0.7937190280623637,
         'support':   7501
     }
 }
+
 ```
 
 ### Re-fit model with all data
