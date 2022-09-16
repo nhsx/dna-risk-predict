@@ -3,7 +3,10 @@
 ## Train, test and validate a CatBoost Classifier for predicting patient non-attendance (DNA)
 
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
-![GitHub Workflow Status](https://github.com/nhsx/dna-risk-predict/actions/workflows/tests.yml/badge.svg?event=push)
+![build: status](https://github.com/nhsx/dna-risk-predict/actions/workflows/tests.yaml/badge.svg?event=push)
+
+
+
 
 ## Table of contents
 
