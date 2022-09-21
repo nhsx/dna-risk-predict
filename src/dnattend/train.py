@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import dnattend._utils as utils
+import dnattend.utils as utils
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -13,12 +14,17 @@ from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split, KFold
 
 
+logger = logging.getLogger(__name__)
+
+
 def splitData(
         data, target, train_size: float = 0.8, test_size: float = 0.1,
         val_size: float = 0.1, seed: int = None):
     """ Split data into test / train / validation """
 
     assert train_size + test_size + val_size == 1
+    logger.info(f'Splitting data: train ({train_size:.1%}) : '
+                f'test ({test_size:.1%}) : validation ({val_size:.1%}).')
     rng = np.random.default_rng(seed)
 
     X = data.copy()
@@ -91,9 +97,11 @@ def trainModel(
     if (catCols is None) and (numericCols is None) and (boolCols is None):
         raise ValueError('No features provided.')
 
+    logger.info('Estimating class weights from data.')
     class_weights = _getClassWeights(data['y_train'])
-    preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
 
+    logger.info('Constructing pre-processing + estimator Pipeline.')
+    preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
     # Combine processor and modelling steps into a Pipeline object
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
     model = Pipeline(steps=[
@@ -107,6 +115,8 @@ def trainModel(
             random_seed=np.random.randint(1e9))),
     ])
 
+    logger.info(f'Performing {cvFolds}-fold cross-validated random search '
+                 f'of hyper-parameters ({hypertuneIterations} iterations).')
     gridSearch = RandomizedSearchCV(
         model, hyperParams, scoring='neg_log_loss',
         random_state=np.random.randint(1e9), cv=cvFolds,
@@ -124,17 +134,22 @@ def trainModel(
         data['X_train'], data['y_train'])
     X_val = fitPreProcessor.transform(data['X_val'])
     evalSet = Pool(X_val, data['y_val'], cat_features=catColIdx)
-
+    logger.info('Re-fitting tuned model to estimate '
+                 'optimal iterations using Early Stopping.')
     _ = model.fit(
         data['X_train'], data['y_train'], estimator__eval_set=evalSet,
         estimator__early_stopping_rounds=earlyStoppingRounds)
 
     # Update iteration parameter to optimal and write to file
     bestIteration = model.named_steps['estimator'].get_best_iteration()
+    logger.info(f'Setting iterations to {bestIteration}.')
     params['estimator__iterations'] = bestIteration
 
     # Tune decision threshold to balance FPR and TPR
+    logger.info('Optimising decision threshold to balance '
+                'true-negative and true-positive rates.')
     threshold = utils._tuneThreshold(model, data['X_train'], data['y_train'])
+    logger.info(f'Setting decision threshold to {threshold:.3f}.')
     params['preprocess__prepare__decisionThreshold'] = threshold
     _ = model.set_params(
         preprocess__prepare__decisionThreshold=threshold,

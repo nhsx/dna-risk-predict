@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
-import dnattend._utils as utils
+import dnattend.utils as utils
+import logging
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve, roc_auc_score, RocCurveDisplay
+
+
+logger = logging.getLogger(__name__)
 
 
 def getFeatureImportance(model):

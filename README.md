@@ -38,10 +38,20 @@ pip install git+https://github.com/nhsx/dna-risk-predict.git
 ## Usage
 
 ```python
+import logging
 from scipy.stats import randint, uniform
+from dnattend.utils import setVerbosity
 from dnattend.data import generateData
 from dnattend.train import trainModel, splitData, refitAllData
 from dnattend.test import getFeatureImportance, plotROC, predict, evaluate
+```
+
+### Initialise Logger
+
+The logging level of dnattend can be set via the setVerbosity() function.
+
+```python
+setVerbosity(logging.INFO)
 ```
 
 ### Generate Example Data

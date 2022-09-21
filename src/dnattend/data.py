@@ -2,9 +2,13 @@
 
 """ Simulate some dummy data for testing """
 
-
+import logging
 import numpy as np
 import pandas as pd
+
+
+logger = logging.getLogger(__name__)
+
 
 def _setProb(x: pd.Series) -> pd.Series:
     """ Simulate DNA probability with artificial values """

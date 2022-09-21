@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 
+import logging
 import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.base import BaseEstimator, TransformerMixin
+
+logger = logging.getLogger(__name__)
+
+
+def setVerbosity(
+        level=logging.INFO, handler=logging.StreamHandler(),
+        format='%(name)s - %(levelname)s - %(message)s'):
+    formatter = logging.Formatter(format)
+    handler.setFormatter(formatter)
+    pkg_logger = logging.getLogger('dnattend')
+    pkg_logger.setLevel(level)
+    pkg_logger.addHandler(handler)
+
 
 class _prepareData(BaseEstimator, TransformerMixin):
 
