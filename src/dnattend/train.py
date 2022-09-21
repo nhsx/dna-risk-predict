@@ -181,6 +181,7 @@ def refitAllData(model, params, data):
     """ Perform final refit with full data """
     model = _rebuildPipeline(model)
     _ = model.set_params(**params)
+    logger.info('Re-fitting model with tuned paramters on full dataset.')
     model.fit(
         pd.concat([data['X_train'], data['X_test'], data['X_val']]),
         pd.concat([data['y_train'], data['y_test'], data['y_val']])
