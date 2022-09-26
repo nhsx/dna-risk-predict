@@ -15,8 +15,15 @@ logger = logging.getLogger(__name__)
 
 
 def getFeatureImportance(model):
+
+    calClassifiers = model.named_steps['estimator'].calibrated_classifiers_
+    importances = 0
+    for classifier in calClassifiers:
+        importances += classifier.base_estimator.feature_importances_
+    importances /= len(calClassifiers)
+    # model.named_steps['estimator'].base_estimator.feature_importances_
     importances = pd.Series(
-        model.named_steps['estimator'].feature_importances_,
+        importances,
         model.named_steps['preprocess'].named_steps['prepare'].validCols
     ).sort_values(ascending=True)
     return importances

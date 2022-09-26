@@ -147,7 +147,8 @@ def trainModel(
     logger.info(f'Setting iterations to {bestIteration}.')
     params['estimator__iterations'] = bestIteration
 
-    # Rebuild pipeline with CalibratedClassifierCV
+    params = _fixParams(params)
+    model = refitData(model, params, data, noTest=True)
 
     # Tune decision threshold to balance FPR and TPR
     logger.info('Optimising decision threshold to balance '
@@ -163,8 +164,18 @@ def trainModel(
     return model, params
 
 
+def _fixParams(params: dict):
+    """ Fix the path to parameters """
+    newParams = {}
+    for param, val in params.items():
+        if param.startswith('estimator__'):
+            param = 'estimator__base_estimator' + param[9:]
+        newParams[param] = val
+    return newParams
+
+
 def _rebuildPipeline(model):
-    """ Rebuild unbuilt pipeline """
+    """ Rebuild pipeline with  CalibratedClassifierCV """
     seed = model.get_params()['estimator__random_seed']
     class_weights = model.get_params()['estimator__class_weights']
     catCols = model.get_params()['preprocess__prepare__catCols']
@@ -172,23 +183,27 @@ def _rebuildPipeline(model):
     boolCols = model.get_params()['preprocess__prepare__boolCols']
     preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
+    estimator = CatBoostClassifier(
+        cat_features=catColIdx, eval_metric='Logloss',
+        class_weights=class_weights, verbose=0,
+        random_seed=seed, allow_writing_files=False)
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
-        ('estimator',      CatBoostClassifier(
-            cat_features=catColIdx, eval_metric='Logloss',
-            class_weights=class_weights, verbose=0,
-            random_seed=seed, allow_writing_files=False)),
+        ('estimator',      CalibratedClassifierCV(estimator)),
     ])
     return model
 
 
-def refitAllData(model, params, data):
+def refitData(model, params, data, noTest=False):
     """ Perform final refit with full data """
     model = _rebuildPipeline(model)
     _ = model.set_params(**params)
     logger.info('Refitting model with tuned parameters on full dataset.')
-    model.fit(
-        pd.concat([data['X_train'], data['X_test'], data['X_val']]),
-        pd.concat([data['y_train'], data['y_test'], data['y_val']])
-    )
+    if noTest:
+        X = [data['X_train'], data['X_val']]
+        y = [data['y_train'], data['y_val']]
+    else:
+        X = [data['X_train'], data['X_test'], data['X_val']]
+        y = [data['y_train'], data['y_test'], data['y_val']]
+    model.fit(pd.concat(X), pd.concat(y))
     return model
