@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
+from sklearn.calibration import CalibrationDisplay
 from sklearn.metrics import roc_curve, roc_auc_score, RocCurveDisplay
 
 
@@ -50,6 +51,15 @@ def plotROC(model, data, figsize=None):
     ax.set_ylabel('True Positive Rate')
     label = f'AUC = {AUC:.2f}, {posClass} Threshold = {threshold:.3f}'
     ax.legend(labels=[label], loc='lower right')
+    return fig, ax
+
+
+def plotCalibrationCurve(model, data, figsize=None):
+    fig, ax = plt.subplots(figsize=figsize)
+    CalibrationDisplay.from_estimator(
+        model, data['X_test'], data['y_test'], ref_line=False, ax=ax)
+    ax.axline((0, 0), slope=1, ls='--', color='red')
+    ax.legend(labels=['DNAttend Model'], loc='lower right')
     return fig, ax
 
 
