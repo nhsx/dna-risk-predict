@@ -38,12 +38,7 @@ def _setProb(x: pd.Series) -> pd.Series:
     p = np.array(list(modifiers.values())).sum()
     # Normalise p to [0, 1]
     p = ((p - minModifier) / (maxModifier - minModifier))
-    if p > 0.65:
-        status = 'DNA'
-    elif p < 0.35:
-        status = 'Attend'
-    else:
-        status = np.random.choice(['DNA', 'Attend'], p=[p, 1-p])
+    status = np.random.choice(['DNA', 'Attend'], p=[p, 1-p])
     return pd.Series([p, status])
 
 
@@ -53,6 +48,7 @@ def generateData(size: int = 50_000, seed: int = 42) -> pd.DataFrame:
         'Wednesday', 'Tuesday', 'Monday', 'Sunday',
         'Saturday', 'Friday', 'Thursday'
     ])
+    logger.info(f'Simulating random dataset with {size} records.')
     data = pd.DataFrame({
         'day': np.random.choice(daysOfWeek, size),
         'priority': np.random.choice(['Urgent', 'Two Week Wait'], size),
@@ -62,5 +58,6 @@ def generateData(size: int = 50_000, seed: int = 42) -> pd.DataFrame:
         'consultationMedia': np.random.choice(['Remote', 'In-Person'], size),
         'site': np.random.choice(['Fairview', 'Lakeside'], size)
     })
+    logger.info(f'Setting target status probabilistically.')
     data[['probability', 'status']] = data.apply(_setProb, axis=1)
     return data
