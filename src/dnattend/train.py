@@ -114,7 +114,6 @@ def trainModel(
             iterations=catboostIterations, verbose=verbose,
             random_seed=np.random.randint(1e9))),
     ])
-
     logger.info(f'Performing {cvFolds}-fold cross-validated random search '
                  f'of hyper-parameters ({hypertuneIterations} iterations).')
     gridSearch = RandomizedSearchCV(
@@ -149,6 +148,7 @@ def trainModel(
     logger.info('Optimising decision threshold to balance '
                 'true-negative and true-positive rates.')
     threshold = utils._tuneThreshold(model, data['X_train'], data['y_train'])
+
     logger.info(f'Setting decision threshold to {threshold:.3f}.')
     params['preprocess__prepare__decisionThreshold'] = threshold
     _ = model.set_params(
@@ -181,7 +181,7 @@ def refitAllData(model, params, data):
     """ Perform final refit with full data """
     model = _rebuildPipeline(model)
     _ = model.set_params(**params)
-    logger.info('Re-fitting model with tuned paramters on full dataset.')
+    logger.info('Refitting model with tuned parameters on full dataset.')
     model.fit(
         pd.concat([data['X_train'], data['X_test'], data['X_val']]),
         pd.concat([data['y_train'], data['y_test'], data['y_val']])
