@@ -59,6 +59,8 @@ def plotCalibrationCurve(model, data, figsize=None):
     CalibrationDisplay.from_estimator(
         model, data['X_test'], data['y_test'], ref_line=False, ax=ax)
     ax.axline((0, 0), slope=1, ls='--', color='red')
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
     ax.legend(labels=['DNAttend Model'], loc='lower right')
     return fig, ax
 

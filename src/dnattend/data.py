@@ -2,6 +2,7 @@
 
 """ Simulate some dummy data for testing """
 
+import random
 import logging
 import numpy as np
 import pandas as pd
@@ -18,9 +19,10 @@ def _setProb(x: pd.Series) -> pd.Series:
         'firstAppointment': 0.2,
         'consultationMedia': 0.3,
         'speciality': 0.35,
-        'site': 0.4
+        'site': 0.4,
+        'random': 0.5
     })
-    maxModifier = np.array(list(modifiers.values())).sum()
+    maxModifier = np.array(list(modifiers.values())).sum() + 0.5
     minModifier = -maxModifier
     if x['day'] in ['Saturday', 'Sunday']:
         modifiers['day'] *= -1
@@ -34,6 +36,7 @@ def _setProb(x: pd.Series) -> pd.Series:
         modifiers['speciality'] *= -1
     if x['site'] == 'Lakeside':
         modifiers['site'] *= -1
+    modifiers['random'] *= x['random']
     # Get probability score as sum of modifiers
     p = np.array(list(modifiers.values())).sum()
     # Normalise p to [0, 1]
@@ -56,7 +59,8 @@ def generateData(size: int = 50_000, seed: int = 42) -> pd.DataFrame:
         'speciality': np.random.choice(['Ophthalmology', 'Audiology'], size),
         'firstAppointment': np.random.choice([True, False], size),
         'consultationMedia': np.random.choice(['Remote', 'In-Person'], size),
-        'site': np.random.choice(['Fairview', 'Lakeside'], size)
+        'site': np.random.choice(['Fairview', 'Lakeside'], size),
+        'random': np.random.uniform(-1, 0, size) # Modifier for attendance weight
     })
     logger.info(f'Setting target status probabilistically.')
     data[['probability', 'status']] = data.apply(_setProb, axis=1)
