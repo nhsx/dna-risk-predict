@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 from scipy.stats import randint, uniform
 from catboost import CatBoostClassifier, Pool
 from sklearn.compose import ColumnTransformer
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split, KFold
@@ -104,15 +105,16 @@ def trainModel(
     preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
     # Combine processor and modelling steps into a Pipeline object
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
+    baseEstimator = CatBoostClassifier(
+        cat_features=catColIdx,
+        eval_metric='Logloss',
+        class_weights=class_weights,
+        allow_writing_files=False,
+        iterations=catboostIterations, verbose=verbose,
+        random_seed=np.random.randint(1e9))
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
-        ('estimator',      CatBoostClassifier(
-            cat_features=catColIdx,
-            eval_metric='Logloss',
-            class_weights=class_weights,
-            allow_writing_files=False,
-            iterations=catboostIterations, verbose=verbose,
-            random_seed=np.random.randint(1e9))),
+        ('estimator',      baseEstimator),
     ])
     logger.info(f'Performing {cvFolds}-fold cross-validated random search '
                  f'of hyper-parameters ({hypertuneIterations} iterations).')
@@ -135,6 +137,7 @@ def trainModel(
     evalSet = Pool(X_val, data['y_val'], cat_features=catColIdx)
     logger.info('Re-fitting tuned model to estimate '
                  'optimal iterations using Early Stopping.')
+
     _ = model.fit(
         data['X_train'], data['y_train'], estimator__eval_set=evalSet,
         estimator__early_stopping_rounds=earlyStoppingRounds)
@@ -143,6 +146,8 @@ def trainModel(
     bestIteration = model.named_steps['estimator'].get_best_iteration()
     logger.info(f'Setting iterations to {bestIteration}.')
     params['estimator__iterations'] = bestIteration
+
+    # Rebuild pipeline with CalibratedClassifierCV
 
     # Tune decision threshold to balance FPR and TPR
     logger.info('Optimising decision threshold to balance '
