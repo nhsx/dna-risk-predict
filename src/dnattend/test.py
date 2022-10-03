@@ -89,5 +89,5 @@ def evaluate(model, data):
     """ Generate classification report using test data """
     predictions = predict(model, data['X_test'])[:,2]
     report = classification_report(
-        data['y_test'], predictions['class'], output_dict=True)
+        data['y_test'], predictions, output_dict=True)
     return report
