@@ -60,10 +60,11 @@ def plotROC(model, data, figsize=None):
     return fig, ax
 
 
-def plotCalibrationCurve(model, data, figsize=None):
+def plotCalibrationCurve(model, data, figsize=None, **kwargs):
     fig, ax = plt.subplots(figsize=figsize)
     CalibrationDisplay.from_estimator(
-        model, data['X_test'], data['y_test'], ref_line=False, ax=ax)
+        model, data['X_test'], data['y_test'],
+        ref_line=False, ax=ax, **kwargs)
     ax.axline((0, 0), slope=1, ls='--', color='red')
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
