@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 from scipy.stats import randint, uniform
 from catboost import CatBoostClassifier, Pool
 from sklearn.compose import ColumnTransformer
+from sklearn.metrics import balanced_accuracy_score
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.utils.class_weight import compute_class_weight
@@ -82,6 +83,7 @@ def trainModel(
         evalIterations: int = 10000,
         earlyStoppingRounds: int = 10,
         hyperParams: dict = None,
+        tuneThresholdBy: str = 'balanced',
         seed: int = 42,
         verbose: int = 0,
         nJobs: int = 1):
@@ -159,7 +161,8 @@ def trainModel(
     # Tune decision threshold to balance FPR and TPR
     logger.info('Optimising decision threshold to balance '
                 'true-negative and true-positive rates.')
-    threshold = utils._tuneThreshold(model, data['X_train'], data['y_train'])
+    threshold = _tuneThreshold(
+        model, data['X_train'], data['y_train'], tuneThresholdBy)
 
     logger.info(f'Setting decision threshold to {threshold:.3f}.')
     params['preprocess__prepare__decisionThreshold'] = threshold
@@ -168,6 +171,28 @@ def trainModel(
     )
 
     return model, params
+
+
+def _tuneThreshold(model, X_train, y_train, mode='balanced'):
+    y_trainInt = y_train.apply(lambda x: 1 if x == model.classes_[1] else 0)
+    trainPredictProb = model.predict_proba(X_train)[:,1]
+    if mode.lower() == 'balanced':
+        logger.info('Tuning threshold for balanced accuracy.')
+        threshold = []
+        accuracy = []
+        for p in np.unique(trainPredictProb):
+          threshold.append(p)
+          y_pred = (model.predict_proba(X_train)[:,1] >= p).astype(int)
+          accuracy.append(balanced_accuracy_score(y_trainInt, y_pred))
+          optimalThreshold = threshold[np.argmax(accuracy)]
+    else:
+        logger.info('Tuning threshold to balance TNR and TPR.')
+        fpr, tpr, thresholds = roc_curve(
+            y_trainInt, trainPredictProb, drop_intermediate=False)
+
+        idx = np.argmin(np.abs(fpr + tpr - 1))
+        optimalThreshold = thresholds[idx]
+    return optimalThreshold
 
 
 def _fixParams(params: dict):
