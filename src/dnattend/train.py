@@ -11,7 +11,6 @@ from catboost import CatBoostClassifier, Pool
 from sklearn.compose import ColumnTransformer
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split, KFold
 
 
@@ -45,14 +44,6 @@ def splitData(
         'X_test': X_test.copy(), 'y_test': y_test.copy(),
         'X_val': X_val.copy(), 'y_val': y_val.copy()
     })
-
-
-def _getClassWeights(y):
-    # Set class weight to balanced probalities for more easy interpretation
-    classes = np.unique(y)
-    weights = compute_class_weight(
-        class_weight='balanced', classes=classes, y=y)
-    return  dict(zip(classes, weights))
 
 
 def _buildPreProcessor(catCols, numericCols, boolCols):
@@ -95,11 +86,14 @@ def trainModel(
             'estimator__random_strength': uniform.rvs(0, 10, size=100),
         })
 
-    if (catCols is None) and (numericCols is None) and (boolCols is None):
+    for colList in [catCols, numericCols, boolCols]:
+        colList = [] if colList is None else colList
+        for col in colList:
+            if col not in data['X_train']:
+                logger.error(f'Feature {col} not in data - removing.')
+                colList.remove(col)
+    if (not catCols) and (not numericCols) and (not boolCols):
         raise ValueError('No features provided.')
-
-    logger.info('Estimating class weights from data.')
-    class_weights = _getClassWeights(data['y_train'])
 
     logger.info('Constructing pre-processing + estimator Pipeline.')
     preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
@@ -108,7 +102,6 @@ def trainModel(
     baseEstimator = CatBoostClassifier(
         cat_features=catColIdx,
         eval_metric='Logloss',
-        class_weights=class_weights,
         allow_writing_files=False,
         iterations=catboostIterations, verbose=verbose,
         random_seed=np.random.randint(1e9))
@@ -177,15 +170,13 @@ def _fixParams(params: dict):
 def _rebuildPipeline(model):
     """ Rebuild pipeline with  CalibratedClassifierCV """
     seed = model.get_params()['estimator__random_seed']
-    class_weights = model.get_params()['estimator__class_weights']
     catCols = model.get_params()['preprocess__prepare__catCols']
     numericCols = model.get_params()['preprocess__prepare__numericCols']
     boolCols = model.get_params()['preprocess__prepare__boolCols']
     preProcessor = _buildPreProcessor(catCols, numericCols, boolCols)
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
     estimator = CatBoostClassifier(
-        cat_features=catColIdx, eval_metric='Logloss',
-        class_weights=class_weights, verbose=0,
+        cat_features=catColIdx, eval_metric='Logloss', verbose=0,
         random_seed=seed, allow_writing_files=False)
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
@@ -198,12 +189,16 @@ def refitData(model, params, data, noTest=False):
     """ Perform final refit with full data """
     model = _rebuildPipeline(model)
     _ = model.set_params(**params)
-    logger.info('Refitting model with tuned parameters on full dataset.')
+
     if noTest:
+        logger.info('Refitting model with tuned parameters '
+                    'on training + validation dataset.')
         X = [data['X_train'], data['X_val']]
         y = [data['y_train'], data['y_val']]
     else:
+        logger.info('Refitting model with tuned parameters on full dataset.')
         X = [data['X_train'], data['X_test'], data['X_val']]
         y = [data['y_train'], data['y_test'], data['y_val']]
+
     model.fit(pd.concat(X), pd.concat(y))
     return model
