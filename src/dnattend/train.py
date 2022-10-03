@@ -199,6 +199,6 @@ def refitData(model, params, data, noTest=False):
         logger.info('Refitting model with tuned parameters on full dataset.')
         X = [data['X_train'], data['X_test'], data['X_val']]
         y = [data['y_train'], data['y_test'], data['y_val']]
-
+    logger.info('Recalibrating probabilities with cross-validation.')
     model.fit(pd.concat(X), pd.concat(y))
     return model
