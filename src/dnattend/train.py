@@ -88,7 +88,7 @@ def trainModel(
 
     for colList in [catCols, numericCols, boolCols]:
         colList = [] if colList is None else colList
-        for col in colList:
+        for col in colList.copy():
             if col not in data['X_train']:
                 logger.error(f'Feature {col} not in data - removing.')
                 colList.remove(col)
