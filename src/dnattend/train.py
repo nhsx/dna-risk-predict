@@ -182,7 +182,7 @@ def _tuneThreshold(model, X_train, y_train, mode='balanced'):
         accuracy = []
         for p in np.unique(trainPredictProb):
           threshold.append(p)
-          y_pred = (model.predict_proba(X_train)[:,1] >= p).astype(int)
+          y_pred = (trainPredictProb >= p).astype(int)
           accuracy.append(balanced_accuracy_score(y_trainInt, y_pred))
           optimalThreshold = threshold[np.argmax(accuracy)]
     else:
