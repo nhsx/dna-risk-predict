@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 def getFeatureImportance(model):
-
     calClassifiers = model.named_steps['estimator'].calibrated_classifiers_
     importances = 0
     for classifier in calClassifiers:
@@ -83,7 +82,7 @@ def predict(model, X):
     out = pd.DataFrame(model.predict_proba(X), columns=classes)
     out['class'] = out[classes[1]].apply(
         lambda x: classes[0] if x < threshold else classes[1])
-    return out
+    return out.values
 
 
 def evaluate(model, data):
