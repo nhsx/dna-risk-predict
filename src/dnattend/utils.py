@@ -63,15 +63,3 @@ class _prepareData(BaseEstimator, TransformerMixin):
             if col in self.validCols:
                 self.catColIdx.append(
                     self.validCols.index(col))
-
-
-def _tuneThreshold(model, X_train, y_train):
-    y_trainInt = y_train.apply(lambda x: 1 if x == model.classes_[1] else 0)
-    trainPredictProb = model.predict_proba(X_train)[:,1]
-
-    fpr, tpr, thresholds = roc_curve(
-        y_trainInt, trainPredictProb, drop_intermediate=False)
-
-    idx = np.argmin(np.abs(fpr + tpr - 1))
-    optimalThreshold = thresholds[idx]
-    return optimalThreshold
