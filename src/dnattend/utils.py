@@ -2,7 +2,6 @@
 
 import logging
 import numpy as np
-from sklearn.metrics import roc_curve
 from sklearn.base import BaseEstimator, TransformerMixin
 
 logger = logging.getLogger(__name__)
