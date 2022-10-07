@@ -80,7 +80,7 @@ def _buildPreProcessor(catCols, numericCols, boolCols, mode: str = 'catboost'):
         preProcessor = Pipeline(steps=[
             ('prepare',         utils._prepareData(catCols, numericCols, boolCols)),
             ('columnTransform', featureTransformer),
-        ])    
+        ])
     return preProcessor
 
 
@@ -244,13 +244,13 @@ def _tuneThreshold(model, X_train, y_train, mode):
         precision, recall, thresholds = precision_recall_curve(
             y_trainInt, trainPredictProb)
         fscore = (2 * precision * recall) / (precision + recall)
-        idx = np.argmax(fscore)
+        idx = np.nanargmax(fscore)
         optimalThreshold = thresholds[idx]
     else:
         logger.info('Tuning threshold by ROC.')
         fpr, tpr, thresholds = roc_curve(
             y_trainInt, trainPredictProb, drop_intermediate=False)
-        idx = np.argmin(np.abs(fpr + tpr - 1))
+        idx = np.nanargmin(np.abs(fpr + tpr - 1))
         optimalThreshold = thresholds[idx]
     return optimalThreshold
 
