@@ -45,7 +45,7 @@ def plotROC(models, data, figsize=None):
         AUC = roc_auc_score(y_test, test_pred_proba)
         fpr, tpr, thresholds = roc_curve(
             y_test, test_pred_proba, drop_intermediate=False)
-        idx = np.argmin(np.abs(fpr + tpr - 1))
+        idx = np.nanargmin(np.abs(fpr + tpr - 1))
         RocCurveDisplay.from_estimator(
             model, data['X_test'], data['y_test'], ax=ax)
         if name == 'catboost':
@@ -72,7 +72,7 @@ def plotPrecisionRecall(models, data, figsize=None):
         precision, recall, thresholds = precision_recall_curve(
             y_test, test_pred_proba, pos_label=1)
         fscore = (2 * precision * recall) / (precision + recall)
-        idx = np.argmax(fscore)
+        idx = np.nanargmax(fscore)
         PrecisionRecallDisplay.from_estimator(
             model, data['X_test'], data['y_test'], ax=ax)
         if name == 'catboost':
@@ -87,7 +87,7 @@ def plotPrecisionRecall(models, data, figsize=None):
     ax.set_ylim([0, 1])
     ax.set_xlabel('Recall')
     ax.set_ylabel('Precision')
-    ax.legend(labels=labels, loc='lower right')
+    ax.legend(labels=labels, loc='upper right')
     return fig, ax
 
 
