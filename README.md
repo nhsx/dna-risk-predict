@@ -98,7 +98,7 @@ hyperParams = ({
 ```
 
 ```python
-models = trainModel(data, hyperParams=hyperParams, **trainingParams)
+models = train.trainModel(data, hyperParams=hyperParams, **trainingParams)
 ```
 
 ![model](./README_files/modelWorkflow.png)
