@@ -34,7 +34,7 @@ pip install git+https://github.com/nhsx/dna-risk-predict.git
 
 ## Worklow
 
-![workflow](./README_files/DNApredictFlowchart.svg)
+![workflow](./README_files/DNApredictFlowchart.png)
  <br> *Overview of DNAttend workflow*
 
 ## Usage
