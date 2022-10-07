@@ -11,7 +11,7 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def _setProb(x: pd.Series) -> pd.Series:
+def _setProb(x: pd.Series, random: float = 0.2) -> pd.Series:
     """ Simulate DNA probability with artificial values """
     modifiers = ({
         'day': 0.05,
@@ -20,7 +20,7 @@ def _setProb(x: pd.Series) -> pd.Series:
         'consultationMedia': 0.3,
         'speciality': 0.35,
         'site': 0.4,
-        'random': 0.5
+        'random': random
     })
     maxModifier = np.array(list(modifiers.values())).sum() + 0.5
     minModifier = -maxModifier
@@ -45,7 +45,8 @@ def _setProb(x: pd.Series) -> pd.Series:
     return pd.Series([p, status])
 
 
-def generateData(size: int = 50_000, seed: int = 42) -> pd.DataFrame:
+def generateData(size: int = 50_000, seed: int = 42,
+                 random: float = 0.2) -> pd.DataFrame:
     np.random.seed(seed)
     daysOfWeek = ([
         'Wednesday', 'Tuesday', 'Monday', 'Sunday',
@@ -63,5 +64,7 @@ def generateData(size: int = 50_000, seed: int = 42) -> pd.DataFrame:
         'random': np.random.uniform(-1, 0, size) # Modifier for attendance weight
     })
     logger.info(f'Setting target status probabilistically.')
-    data[['probability', 'status']] = data.apply(_setProb, axis=1)
+    data[['probability', 'status']] = data.apply(
+        _setProb, args=(random,), axis=1)
+    data['status'] = (data['status'] == 'DNA').astype(int)
     return data

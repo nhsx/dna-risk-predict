@@ -16,8 +16,10 @@
     * [Evaluate Model](#evaluate-model)
       * [Feature Importance](#feature-importance)
       * [ROC Curve](#roc-curve)
+      * [Precision-Recall Curve](#precision-recall-curve)
+      * [Calibration Curve](#calibration-curve)
       * [Evaluation Report](#evaluation-report)
-    * [Re-fit model with all data](#re-fit-model-with-all-data)
+    * [Refit Model with All Data](#refit-model-with-all-data)
   * [Generate Predictions](#generate-predictions)
   * [Contributing](#contributing)
   * [License](#license)
@@ -40,31 +42,29 @@ pip install git+https://github.com/nhsx/dna-risk-predict.git
 ```python
 import logging
 from scipy.stats import randint, uniform
-from dnattend.utils import setVerbosity
-from dnattend.data import generateData
-from dnattend.train import trainModel, splitData, refitAllData
-from dnattend.test import getFeatureImportance, plotROC, predict, evaluate
+from dnattend import utils, data, test, train
 ```
 
 ### Initialise Logger
 
-The logging level of dnattend can be set via the setVerbosity() function.
+The logging level of DNAttend can be set via the setVerbosity() function.
 
 ```python
-setVerbosity(logging.INFO)
+utils.setVerbosity(logging.INFO)
 ```
 
 ### Generate Example Data
 
 ```python
 # Randomly generate some artificial attendance data
-df = generateData(size=50_000, seed=42)
+df = data.generateData(size=50_000, seed=42)
 ```
 
 ### Split Data (Test, Train, Validation)
 
 ```python
-data = splitData(df, target='status', train_size=0.7, test_size=0.15, val_size=0.15)
+data = train.splitData(
+    df, target='status', train_size=0.7, test_size=0.15, val_size=0.15)
 ```
 
 ### Train Model
@@ -78,6 +78,7 @@ trainingParams = ({
     'catCols':             catCols,
     'boolCols':            boolCols,
     'numericCols':         numericCols,
+    'tuneThresholdBy':     'f1',
     'cvFolds':             5,
     'catboostIterations':  100,
     'hypertuneIterations': 5,
@@ -97,40 +98,60 @@ hyperParams = ({
 ```
 
 ```python
-model, params = trainModel(data, hyperParams=hyperParams, **trainingParams)
+models = trainModel(data, hyperParams=hyperParams, **trainingParams)
 ```
 
-![model](./README_files/modelWorkflow.svg)
- <br> *Summary of scikit-learn Pipeline*
+![model](./README_files/modelWorkflow.png)
+ <br> *Summary of DNAttend CatBoost Pipeline*
 
 ### Evaluate Model
 
 #### Feature Importance
 
 ```python
-featureImportances = getFeatureImportance(model)
+featureImportances = test.getFeatureImportance(models['catboost']['model'])
 fig = featureImportances.plot.barh()
 fig.figure.savefig('featureImportances.png')
 ```
 
-![featureImporance](./README_files/featureImportances.svg)
-
+![featureImportance](./README_files/featureImportances.pdf)
+ <br> *Feature Importances.*
 
 #### ROC Curve
 
 ```python
-fig, ax = plotROC(model, data)
-fig.figure.savefig('ROCcurve.svg')
+fig, ax = test.plotROC(models, data)
+fig.figure.savefig('ROCcurve.png')
 ```
 
+![ROC](./README_files/ROCcurve.png)
+ <br> *Receiver Operating Characteristic curve for both CatBoost and Logistic Model.*
 
-![ROC](./README_files/ROCcurve.svg)
+#### Precision-Recall Curve
+
+```python
+fig, ax = test.plotPrecisionRecall(models, data)
+fig.figure.savefig('PRcurve.png', dpi=300)
+```
+
+![ROC](./README_files/PRcurve.png)
+ <br> *Precision-Recall curve for both CatBoost and Logistic Model.*
+
+#### Calibration Curve
+
+```python
+fig, ax = test.plotCalibrationCurve(models, data, strategy='quantile')
+fig.figure.savefig('CalibrationCurve.png')
+```
+
+![ROC](./README_files/CalibrationCurve.png)
+ <br> *Calibration curve for both CatBoost and Logistic Model.*
 
 #### Evaluation Report
 The `evaluate()` function computes a comprehensive set of performance metrics using the `test` data.
 
 ```python
-report = evaluate(model, data)
+report = test.evaluate(models['catboost']['model'], data)
 
 print(report)
 {
@@ -163,11 +184,12 @@ print(report)
 
 ```
 
-### Re-fit model with all data
-Following parameterisation and validation the `refitAllData()` function can be used to refit a new model on the whole data set.
+### Refit Model with All Data
+Following parameterisation, decision threshold tuning and validation the `refitData()` function can be used to refit a new model on the whole data set.
 
 ```python
-model = refitAllData(model, params, data)
+modelType = 'catboost' # select from catboost or logistic
+finalModel = train.refitData(models[modelType]['model'], data)
 ```
 
 ### Generate Predictions
@@ -177,7 +199,7 @@ The output of `predict()` includes the decision class (i.e.`Attend` and `DNA`) a
 The output results of this example can be found [here](./README_files/example-data-predictions.csv)
 
 ```python
-df[['Attend', 'DNA', 'class']] = predict(model, df)
+df[['Attend', 'DNA', 'class']] = test.predict(finalModel, df)
 ```
 
 ### Contributing
