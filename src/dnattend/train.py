@@ -10,6 +10,7 @@ from scipy.stats import randint, uniform
 from category_encoders.woe import WOEEncoder
 from catboost import CatBoostClassifier, Pool
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.calibration import CalibratedClassifierCV
@@ -69,10 +70,17 @@ def _buildPreProcessor(catCols, numericCols, boolCols, mode: str = 'catboost'):
     ])
     featureTransformer = ColumnTransformer(
         transformers=transformers, remainder='drop')
-    preProcessor = Pipeline(steps=[
-        ('prepare',         utils._prepareData(catCols, numericCols, boolCols)),
-        ('columnTransform', featureTransformer),
+    if mode == 'logistic':
+        preProcessor = Pipeline(steps=[
+            ('prepare',         utils._prepareData(catCols, numericCols, boolCols)),
+            ('columnTransform', featureTransformer),
+            ('scale',           StandardScaler()),
     ])
+    else:
+        preProcessor = Pipeline(steps=[
+            ('prepare',         utils._prepareData(catCols, numericCols, boolCols)),
+            ('columnTransform', featureTransformer),
+        ])    
     return preProcessor
 
 
