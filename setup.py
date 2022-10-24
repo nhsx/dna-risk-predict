@@ -47,6 +47,7 @@ setup(
         'catboost',
         'matplotlib',
         'scikit-learn',
+        'category-encoders'
     ],
     license='MIT',
     classifiers=[
