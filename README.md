@@ -37,27 +37,13 @@ pip install git+https://github.com/nhsx/dna-risk-predict.git
 ![workflow](./README_files/DNApredictFlowchart.png)
  <br> *Overview of DNAttend workflow*
 
-## Usage
-
-```python
-import logging
-from scipy.stats import randint, uniform
-from dnattend import utils, data, test, train
-```
-
-### Initialise Logger
-
-The logging level of DNAttend can be set via the setVerbosity() function.
-
-```python
-utils.setVerbosity(logging.INFO)
-```
 
 ### Generate Example Data
+The ```simulate``` sub-command generates suitably formatted input data for testing functionality.
+It also writes an example config file in YAML format.
 
-```python
-# Randomly generate some artificial attendance data
-df = data.generateData(size=50_000, seed=42)
+```bash
+dnattend simulate --config config.yaml > DNAttend-example.csv
 ```
 
 ### Split Data (Test, Train, Validation)

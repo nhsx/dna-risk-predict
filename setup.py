@@ -32,6 +32,9 @@ setup(
     author='Stephen Richer',
     author_email='stephen.richer@nhs.net',
     url='https://github.com/nhsx/dna-risk-predict',
+    entry_points={
+        'console_scripts': ['dnattend=dnattend.parseArgs:parseArgs']
+    },
     python_requires='>=3.8.0',
     install_requires=[
         'shap',

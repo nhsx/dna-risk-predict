@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import yaml
+import pprint
 import logging
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -62,3 +64,75 @@ class _prepareData(BaseEstimator, TransformerMixin):
             if col in self.validCols:
                 self.catColIdx.append(
                     self.validCols.index(col))
+
+
+class Config():
+    """ Custom class to read, validate and
+        set defaults of YAML configuration file
+        """
+
+    def __init__(self, pathToYaml):
+        self.error = False
+        # Reserved string for mandatory arguments
+        self.mandatory = 'mandatory'
+        self.pathToYaml = pathToYaml
+        self.config = self._readYAML()
+        self._setDefault(self.config, self.default)
+        self._postProcessConfig()
+        if self.error:
+            logging.error(
+                f'Expected format:\n\n{pprint.pformat(self.default)}')
+            raise ValueError('Invalid configuration.')
+
+    def _setDefault(self, config, default, path=''):
+        """ Recursively set default values. """
+        for k in default:
+            if isinstance(default[k], dict):
+                if not isinstance(config[k], dict):
+                    logging.error(
+                        f'"{config[k]}" should be a dictionary.')
+                    self.error = True
+                else:
+                    self._setDefault(
+                        config.setdefault(k, {}), default[k], path=path+k)
+            else:
+                if (((k not in config) or (config[k] is None))
+                        and (default[k] == self.mandatory)):
+                    msg = f'{path}: {k}' if path else k
+                    logging.error(
+                        f'Missing mandatory config "{msg}".')
+                    self.error = True
+                config.setdefault(k, default[k])
+
+    def _readYAML(self):
+        """ Custom validation """
+        with open(self.pathToYaml, 'r') as stream:
+            return yaml.safe_load(stream)
+
+    @property
+    def default(self):
+        """ Default values of configuration file. """
+        return ({
+            'input': self.mandatory,
+            'target': self.mandatory,
+            'out': '.',
+            'hyperParams': None,
+            'catCols': [],
+            'boolCols': [],
+            'numericCols': [],
+            'train_size': 0.7,
+            'test_size': 0.15,
+            'val_size': 0.15,
+            'tuneThresholdBy':     'f1',
+            'cvFolds':             5,
+            'catboostIterations':  100,
+            'hypertuneIterations': 5,
+            'evalIterations':      10_000,
+            'earlyStoppingRounds': 10,
+            'seed':                42
+        })
+
+
+    def _postProcessConfig(self):
+        """ Additional config modifications """
+        pass

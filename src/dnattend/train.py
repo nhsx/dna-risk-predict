@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 def splitData(
         data, target, train_size: float = 0.8, test_size: float = 0.1,
-        val_size: float = 0.1, seed: int = None):
+        val_size: float = 0.1, seed: int = None, **kwargs):
     """ Split data into test / train / validation """
 
     assert train_size + test_size + val_size == 1
@@ -98,7 +98,7 @@ def trainModel(
         tuneThresholdBy: str = 'f1',
         seed: int = 42,
         verbose: int = 0,
-        nJobs: int = 1):
+        nJobs: int = 1,  **kwargs):
 
     np.random.seed(seed)
     for colList in [catCols, numericCols, boolCols]:

@@ -11,7 +11,7 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def _setProb(x: pd.Series, random: float = 0.2) -> pd.Series:
+def _setProb(x: pd.Series, noise: float = 0.2) -> pd.Series:
     """ Simulate DNA probability with artificial values """
     modifiers = ({
         'day': 0.05,
@@ -20,7 +20,7 @@ def _setProb(x: pd.Series, random: float = 0.2) -> pd.Series:
         'consultationMedia': 0.3,
         'speciality': 0.35,
         'site': 0.4,
-        'random': random
+        'noise': noise
     })
     maxModifier = np.array(list(modifiers.values())).sum() + 0.5
     minModifier = -maxModifier
@@ -36,7 +36,7 @@ def _setProb(x: pd.Series, random: float = 0.2) -> pd.Series:
         modifiers['speciality'] *= -1
     if x['site'] == 'Lakeside':
         modifiers['site'] *= -1
-    modifiers['random'] *= x['random']
+    modifiers['noise'] *= x['noise']
     # Get probability score as sum of modifiers
     p = np.array(list(modifiers.values())).sum()
     # Normalise p to [0, 1]
@@ -46,7 +46,7 @@ def _setProb(x: pd.Series, random: float = 0.2) -> pd.Series:
 
 
 def generateData(size: int = 50_000, seed: int = 42,
-                 random: float = 0.2) -> pd.DataFrame:
+                 noise: float = 0.2) -> pd.DataFrame:
     np.random.seed(seed)
     daysOfWeek = ([
         'Wednesday', 'Tuesday', 'Monday', 'Sunday',
@@ -61,10 +61,10 @@ def generateData(size: int = 50_000, seed: int = 42,
         'firstAppointment': np.random.choice([True, False], size),
         'consultationMedia': np.random.choice(['Remote', 'In-Person'], size),
         'site': np.random.choice(['Fairview', 'Lakeside'], size),
-        'random': np.random.uniform(-1, 0, size) # Modifier for attendance weight
+        'noise': np.random.uniform(-1, 0, size) # Modifier for attendance weight
     })
     logger.info(f'Setting target status probabilistically.')
     data[['probability', 'status']] = data.apply(
-        _setProb, args=(random,), axis=1)
+        _setProb, args=(noise,), axis=1)
     data['status'] = (data['status'] == 'DNA').astype(int)
     return data
