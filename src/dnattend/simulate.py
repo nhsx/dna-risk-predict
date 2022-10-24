@@ -2,6 +2,7 @@
 
 """ Simulate some dummy data for testing """
 
+import yaml
 import random
 import logging
 import numpy as np
@@ -68,3 +69,32 @@ def generateData(size: int = 50_000, seed: int = 42,
         _setProb, args=(noise,), axis=1)
     data['status'] = (data['status'] == 'DNA').astype(int)
     return data
+
+
+def writeConfig(config: str = None):
+    catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
+    boolCols = ['firstAppointment']
+    numericCols = ['age']
+    config_settings = ({
+        'input': 'DNAttend-example.csv',
+        'finalModel': 'catboost',
+        'target': 'status',
+        'catCols': catCols,
+        'boolCols': boolCols,
+        'numericCols': numericCols,
+        'train_size': 0.7,
+        'test_size': 0.15,
+        'val_size': 0.15,
+        'tuneThresholdBy':     'f1',
+        'cvFolds':             5,
+        'catboostIterations':  100,
+        'hypertuneIterations': 5,
+        'evalIterations':      10_000,
+        'earlyStoppingRounds': 10,
+        'seed':                42
+    })
+    if config is None:
+        yaml.dump(config_settings, sys.stderr)
+    else:
+        with open(config, 'w') as fh:
+            yaml.dump(config_settings, fh)

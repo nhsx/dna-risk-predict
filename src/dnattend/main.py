@@ -2,7 +2,6 @@
 
 import os
 import sys
-import yaml
 import json
 import joblib
 import hashlib
@@ -111,15 +110,17 @@ def verifyHash(df: str, readSize: int = 4096):
                     '219e157f75bd054bbed84276e7ca6c81')
 
 
-def simulate_cli(config: str, size: int, noise: float, seed: int):
+def simulate_cli(
+        config: str, size: int = 50_000,
+        noise: float = 0.2, seed: int = 42, out=sys.stdout):
     """ Randomly generate some example data """
     assert seed > 0
     assert size > 0
     assert noise >= 0
     # Randomly generate some artificial attendance data
     df = simulate.generateData(size, seed, noise)
-    df.to_csv(sys.stdout, index=False)
-    _writeConfig(config)
+    df.to_csv(out, index=False)
+    simulate.writeConfig(config)
 
 
 def _readData(config):
@@ -128,32 +129,3 @@ def _readData(config):
     for name in ['X_train', 'y_train', 'X_test', 'y_test', 'X_val', 'y_val']:
         data[name] = pd.read_pickle(f'{config["out"]}/{name}.pkl')
     return data
-
-
-def _writeConfig(config: str = None):
-    catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
-    boolCols = ['firstAppointment']
-    numericCols = ['age']
-    config_settings = ({
-        'input': 'DNAttend-example.csv',
-        'finalModel': 'catboost',
-        'target': 'status',
-        'catCols': catCols,
-        'boolCols': boolCols,
-        'numericCols': numericCols,
-        'train_size': 0.7,
-        'test_size': 0.15,
-        'val_size': 0.15,
-        'tuneThresholdBy':     'f1',
-        'cvFolds':             5,
-        'catboostIterations':  100,
-        'hypertuneIterations': 5,
-        'evalIterations':      10_000,
-        'earlyStoppingRounds': 10,
-        'seed':                42
-    })
-    if config is None:
-        yaml.dump(config_settings, sys.stderr)
-    else:
-        with open(config, 'w') as fh:
-            yaml.dump(config_settings, fh)
