@@ -38,9 +38,9 @@ setup(
     python_requires='>=3.8.0',
     install_requires=[
         'shap',
-        'yaml',
         'scipy',
         'numpy',
+        'pyyaml',
         'pandas',
         'joblib',
         'seaborn',
