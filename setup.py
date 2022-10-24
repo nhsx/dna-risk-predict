@@ -38,7 +38,7 @@ setup(
     python_requires='>=3.8.0',
     install_requires=[
         'shap',
-        'yaml'
+        'yaml',
         'scipy',
         'numpy',
         'pandas',
