@@ -66,6 +66,9 @@ def parseArgs() -> argparse.Namespace:
     sp4.add_argument(
         'model', help='Trained model in pickl format.')
     sp4.add_argument(
+        '--verify', action='store_true',
+        help='Validat output against example hash (default: %(default)s)')
+    sp4.add_argument(
         '--sep', default=',',
         help='Seperator of input dats (default: %(default)s)')
     sp4.set_defaults(function=predict_cli)

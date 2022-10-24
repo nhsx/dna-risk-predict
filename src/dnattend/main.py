@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import yaml
 import json
 import joblib
+import hashlib
+import tempfile
+import numpy as np
 import pandas as pd
 from . import utils, simulate, test, train
 
@@ -11,6 +15,8 @@ from . import utils, simulate, test, train
 def train_cli(config: str):
     """ Train a model """
     config = utils.Config(config).config
+    # Set global seed
+    np.random.seed(config['seed'])
     # Read data and map DNA target label to 1
     data = pd.read_csv(config['input'])
     assert len(data[config['target']].unique()) == 2
@@ -33,6 +39,7 @@ def train_cli(config: str):
 def test_cli(config: str):
     """ Test a pre-trained model. """
     config = utils.Config(config).config
+    np.random.seed(config['seed']) # Set global seed
     data = _readData(config)
     models = {'catboost': {}, 'logistic': {}}
     for name in models:
@@ -63,6 +70,7 @@ def test_cli(config: str):
 def retrain_cli(config: str):
     """ Re-train model on full dataset """
     config = utils.Config(config).config
+    np.random.seed(config['seed']) # Set global seed
     data = _readData(config)
     modelType = config['finalModel']
     if modelType not in ['catboost', 'logistic']:
@@ -77,13 +85,30 @@ def retrain_cli(config: str):
     joblib.dump(model, f'{config["out"]}/{modelType}-final.pkl')
 
 
-def predict_cli(data, model, sep: str = ','):
+def predict_cli(data, model, verify: bool = False, sep: str = ','):
     data = pd.read_csv(data, sep=sep)
     model = joblib.load(model)
     data[['Attend_prob', 'DNA_prob', 'Prediction']] = (
         test.predict(model, data))
     data['Prediction'] = data['Prediction'].map({1: 'DNA', 0: 'Attend'})
     data.to_csv(sys.stdout)
+    if verify:
+        verifyHash(data)
+
+
+def verifyHash(df: str, readSize: int = 4096):
+    tf = tempfile.NamedTemporaryFile(delete=False)
+    df.to_csv(tf.name)
+    sha256Hash = hashlib.sha256()
+    with open(tf.name, 'rb') as f:
+        data = f.read(readSize)
+        while data:
+            sha256Hash.update(data)
+            data = f.read(readSize)
+    hash = sha256Hash.hexdigest()
+    os.remove(tf.name)
+    assert hash == ('a3139e0247c4b2db2fb797c6730da02b'
+                    '219e157f75bd054bbed84276e7ca6c81')
 
 
 def simulate_cli(config: str, size: int, noise: float, seed: int):

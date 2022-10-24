@@ -24,25 +24,22 @@ logger = logging.getLogger(__name__)
 
 def splitData(
         data, target, train_size: float = 0.8, test_size: float = 0.1,
-        val_size: float = 0.1, seed: int = None, **kwargs):
+        val_size: float = 0.1, **kwargs):
     """ Split data into test / train / validation """
 
     assert train_size + test_size + val_size == 1
     logger.info(f'Splitting data: train ({train_size:.1%}) : '
                 f'test ({test_size:.1%}) : validation ({val_size:.1%}).')
-    rng = np.random.default_rng(seed)
 
     X = data.copy()
     y = X.pop(target)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=(1 - train_size),
-        random_state=rng.integers(1e9))
+        X, y, test_size=(1 - train_size))
 
     split2Size = test_size / (test_size + val_size)
     X_val, X_test, y_val, y_test = train_test_split(
-        X_test, y_test, test_size=split2Size,
-        random_state=rng.integers(1e9))
+        X_test, y_test, test_size=split2Size)
 
     return ({
         'X_train': X_train.copy(), 'y_train': y_train.copy(),
@@ -96,11 +93,9 @@ def trainModel(
         earlyStoppingRounds: int = 10,
         hyperParams: dict = None,
         tuneThresholdBy: str = 'f1',
-        seed: int = 42,
         verbose: int = 0,
         nJobs: int = 1,  **kwargs):
 
-    np.random.seed(seed)
     for colList in [catCols, numericCols, boolCols]:
         colList = [] if colList is None else colList
         for col in colList.copy():
@@ -148,8 +143,7 @@ def _trainLogistic(
     logger.info('Running base logistic regression model...')
     preProcessor = _buildPreProcessor(
         catCols, numericCols, boolCols, mode='logistic')
-    baseEstimator = LogisticRegression(
-        class_weight='balanced', random_state=np.random.randint(1e9))
+    baseEstimator = LogisticRegression(class_weight='balanced')
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
         ('estimator',      baseEstimator),
@@ -195,8 +189,7 @@ def _trainCatBoost(
         eval_metric='Logloss',
         class_weights=class_weights,
         allow_writing_files=False,
-        iterations=catboostIterations, verbose=verbose,
-        random_seed=np.random.randint(1e9))
+        iterations=catboostIterations, verbose=verbose)
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
         ('estimator',      baseEstimator),
@@ -204,8 +197,7 @@ def _trainCatBoost(
     logger.info(f'Performing {cvFolds}-fold cross-validated random search '
                  f'of hyper-parameters ({hypertuneIterations} iterations).')
     gridSearch = RandomizedSearchCV(
-        model, hyperParams, scoring='neg_log_loss',
-        random_state=np.random.randint(1e9), cv=cvFolds,
+        model, hyperParams, scoring='neg_log_loss', cv=cvFolds,
         refit=False, n_jobs=nJobs, n_iter=hypertuneIterations, verbose=verbose)
     _ = gridSearch.fit(data['X_train'], data['y_train'])
 
@@ -273,16 +265,14 @@ def _rebuildPipeline(model, mode: str = 'catboost'):
     preProcessor = _buildPreProcessor(catCols, numericCols, boolCols, mode)
     catColIdx = preProcessor.named_steps['prepare'].catColIdx
     if mode == 'catboost':
-        seed = model.get_params()['estimator__random_seed']
         class_weights = model.get_params()['estimator__class_weights']
         estimator = CatBoostClassifier(
             cat_features=catColIdx, eval_metric='Logloss',
             class_weights=class_weights, verbose=0,
-            random_seed=seed, allow_writing_files=False)
+            allow_writing_files=False)
     else:
-        seed = model.get_params()['estimator__random_state']
         estimator = LogisticRegression(
-            class_weight='balanced', verbose=0, random_state=seed)
+            class_weight='balanced', verbose=0)
     model = Pipeline(steps=[
         ('preprocess',     preProcessor),
         ('estimator',      CalibratedClassifierCV(estimator)),

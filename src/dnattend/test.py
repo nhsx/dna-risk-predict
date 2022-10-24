@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import dnattend.utils as utils
+
 import logging
 import numpy as np
 import pandas as pd
