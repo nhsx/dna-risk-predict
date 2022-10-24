@@ -10,4 +10,4 @@ def test_template():
     main.train_cli('config.yaml')
     main.retrain_cli('config.yaml')
     main.predict_cli(
-        'DNAttend-example.csv', 'catboost-final.pkl', verify=True)
+        'DNAttend-example.csv', 'catboost-final.pkl', out=None, verify=True)

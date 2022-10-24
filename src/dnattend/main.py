@@ -84,13 +84,15 @@ def retrain_cli(config: str):
     joblib.dump(model, f'{config["out"]}/{modelType}-final.pkl')
 
 
-def predict_cli(data, model, verify: bool = False, sep: str = ','):
+def predict_cli(
+        data, model, verify: bool = False, sep: str = ',', out = sys.stdout):
     data = pd.read_csv(data, sep=sep)
     model = joblib.load(model)
     data[['Attend_prob', 'DNA_prob', 'Prediction']] = (
         test.predict(model, data))
     data['Prediction'] = data['Prediction'].map({1: 'DNA', 0: 'Attend'})
-    data.to_csv(sys.stdout)
+    if out is not None:
+        data.to_csv(out)
     if verify:
         verifyHash(data)
 
