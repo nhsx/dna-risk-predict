@@ -66,7 +66,7 @@ The output of `predict` includes the decision class (i.e.`Attend` and `DNA`) and
 The output results of this example can be found [here](./README_files/example-data-predictions.csv)
 
 ```bash
-dnattend predict DNAttend-example.csv catboost-final.pkl > FinalPredictions.csv
+dnattend predict --verify DNAttend-example.csv catboost-final.pkl > FinalPredictions.csv
 ```
 
 ### Contributing
