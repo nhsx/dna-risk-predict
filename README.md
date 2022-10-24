@@ -61,7 +61,7 @@ dnattend retrain config.yaml
 
 ### Generate Predictions
 The trained model is now ready to be used.
-Predictions should be made with the `predict` module - this ensures the tuned decision threshold is correct applied when assigning classes.
+Predictions should be made with the `predict` module - this ensures the tuned decision threshold is correctly applied when assigning classes.
 The output of `predict` includes the decision class (i.e.`Attend` and `DNA`) and the underlying probabilities of theses classes.
 The output results of this example can be found [here](./README_files/example-data-predictions.csv)
 
