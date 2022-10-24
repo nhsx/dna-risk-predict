@@ -9,22 +9,31 @@ from . import utils, simulate, test, train
 
 
 def train_cli(config: str):
-    """ Run training component """
+    """ Train a model """
     config = utils.Config(config).config
+    # Read data and map DNA target label to 1
     data = pd.read_csv(config['input'])
+    assert len(data[config['target']].unique()) == 2
+    assert config['DNAclass'] in data[config['target']].unique()
+    data[config['target']] = data[config['target']].apply(
+        lambda x: 1 if x == config['DNAclass'] else 0)
     data = train.splitData(data, **config)
+    # Train model
     models = train.trainModel(data, **config)
+    # Write trained logistic and catboost models and parameter definitions
     for name, model in models.items():
         joblib.dump(model['model'], f'{config["out"]}/{name}-trained.pkl')
         with open(f'{config["out"]}/{name}-params.json', 'w') as fh:
             json.dump(model['params'], fh)
+    # Write split data
+    for name, df in data.items():
+        df.to_pickle(f'{config["out"]}/{name}.pkl')
 
 
 def test_cli(config: str):
-    """ Run training component """
+    """ Test a pre-trained model. """
     config = utils.Config(config).config
-    data = pd.read_csv(config['input'])
-    data = train.splitData(data, **config)
+    data = _readData(config)
     models = {'catboost': {}, 'logistic': {}}
     for name in models:
         models[name]['model'] = joblib.load(
@@ -51,6 +60,32 @@ def test_cli(config: str):
             json.dump(report, fh)
 
 
+def retrain_cli(config: str):
+    """ Re-train model on full dataset """
+    config = utils.Config(config).config
+    data = _readData(config)
+    modelType = config['finalModel']
+    if modelType not in ['catboost', 'logistic']:
+        if modelType:
+            logging.error(
+                f'Invalid configuration for "finalModel" - {finalModel}')
+        logging.error(
+            'Please set "finalModel" to either "catboost" or "logistic"')
+    model = joblib.load(
+        f'{config["out"]}/{modelType}-trained.pkl')
+    model = train.refitData(model, data)
+    joblib.dump(model, f'{config["out"]}/{modelType}-final.pkl')
+
+
+def predict_cli(data, model, sep: str = ','):
+    data = pd.read_csv(data, sep=sep)
+    model = joblib.load(model)
+    data[['Attend_prob', 'DNA_prob', 'Prediction']] = (
+        test.predict(model, data))
+    data['Prediction'] = data['Prediction'].map({1: 'DNA', 0: 'Attend'})
+    data.to_csv(sys.stdout)
+
+
 def simulate_cli(config: str, size: int, noise: float, seed: int):
     """ Randomly generate some example data """
     assert seed > 0
@@ -62,12 +97,21 @@ def simulate_cli(config: str, size: int, noise: float, seed: int):
     _writeConfig(config)
 
 
+def _readData(config):
+    """ Read pre-split data """
+    data = {}
+    for name in ['X_train', 'y_train', 'X_test', 'y_test', 'X_val', 'y_val']:
+        data[name] = pd.read_pickle(f'{config["out"]}/{name}.pkl')
+    return data
+
+
 def _writeConfig(config: str = None):
     catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
     boolCols = ['firstAppointment']
     numericCols = ['age']
     config_settings = ({
         'input': 'DNAttend-example.csv',
+        'finalModel': 'catboost',
         'target': 'status',
         'catCols': catCols,
         'boolCols': boolCols,

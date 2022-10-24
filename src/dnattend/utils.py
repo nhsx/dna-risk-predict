@@ -6,6 +6,7 @@ import logging
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -115,7 +116,9 @@ class Config():
         return ({
             'input': self.mandatory,
             'target': self.mandatory,
+            'DNAclass': 1,
             'out': '.',
+            'finalModel': '',
             'hyperParams': None,
             'catCols': [],
             'boolCols': [],

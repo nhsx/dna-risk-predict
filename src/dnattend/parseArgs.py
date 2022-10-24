@@ -6,7 +6,7 @@ import sys
 import logging
 import argparse
 from timeit import default_timer as timer
-from .main import train_cli, test_cli, simulate_cli
+from .main import train_cli, test_cli, retrain_cli, predict_cli, simulate_cli
 from ._version import __version__
 
 
@@ -44,25 +44,52 @@ def parseArgs() -> argparse.Namespace:
     sp2.set_defaults(function=test_cli)
 
 
+    sp3 = subparser.add_parser(
+        'retrain',
+        description=retrain_cli.__doc__,
+        help='Retrain model.',
+        parents=[baseParser],
+        epilog=parser.epilog)
+    sp3.add_argument(
+        'config', help='YAML configuration file.')
+    sp3.set_defaults(function=retrain_cli)
+
+
     sp4 = subparser.add_parser(
+        'predict',
+        description=predict_cli.__doc__,
+        help='Run predictions model.',
+        parents=[baseParser],
+        epilog=parser.epilog)
+    sp4.add_argument(
+        'data', help='Data to generate predictions.')
+    sp4.add_argument(
+        'model', help='Trained model in pickl format.')
+    sp4.add_argument(
+        '--sep', default=',',
+        help='Seperator of input dats (default: %(default)s)')
+    sp4.set_defaults(function=predict_cli)
+
+
+    sp5 = subparser.add_parser(
         'simulate',
         description=simulate_cli.__doc__,
         help='Simulate test data.',
         parents=[baseParser],
         epilog=parser.epilog)
-    sp4.add_argument(
+    sp5.add_argument(
         '--config',
         help='Path to write default config file (default: stderr)')
-    sp4.add_argument(
+    sp5.add_argument(
         '--size', type=int, default=50_000,
         help='Number of records to simulate (default: %(default)s)')
-    sp4.add_argument(
+    sp5.add_argument(
         '--noise', type=float, default=0.2,
         help='Scale factor for random noise (default: %(default)s)')
-    sp4.add_argument(
+    sp5.add_argument(
         '--seed', type=int, default=42,
         help='Seed for random number generator (default: %(default)s)')
-    sp4.set_defaults(function=simulate_cli)
+    sp5.set_defaults(function=simulate_cli)
 
     args = parser.parse_args()
     if 'function' not in args:
