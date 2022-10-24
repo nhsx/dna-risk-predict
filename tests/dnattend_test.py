@@ -6,7 +6,6 @@ from dnattend import main
 
 @pytest.mark.filterwarnings("ignore::FutureWarning")
 def test_template():
-    pass
     main.simulate_cli('config.yaml', out='DNAttend-example.csv')
     main.train_cli('config.yaml')
     main.retrain_cli('config.yaml')

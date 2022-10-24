@@ -5,10 +5,14 @@ import sys
 import json
 import joblib
 import hashlib
+import logging
 import tempfile
 import numpy as np
 import pandas as pd
 from . import utils, simulate, test, train
+
+
+logger = logging.getLogger(__name__)
 
 
 def train_cli(config: str):
@@ -94,12 +98,15 @@ def predict_cli(
     if out is not None:
         data.to_csv(out)
     if verify:
-        verifyHash(data)
+        if verifyHash(data):
+            logger.info('Output matches expected hash.')
+        else:
+            logger.error('Output does NOT match expected hash')
 
 
 def verifyHash(df: str, readSize: int = 4096):
     tf = tempfile.NamedTemporaryFile(delete=False)
-    df.to_csv(tf.name)
+    df.to_csv(tf.name, float_format='%.3f')
     sha256Hash = hashlib.sha256()
     with open(tf.name, 'rb') as f:
         data = f.read(readSize)
@@ -108,8 +115,8 @@ def verifyHash(df: str, readSize: int = 4096):
             data = f.read(readSize)
     hash = sha256Hash.hexdigest()
     os.remove(tf.name)
-    assert hash == ('a3139e0247c4b2db2fb797c6730da02b'
-                    '219e157f75bd054bbed84276e7ca6c81')
+    return hash == ('801cb98641256aaf8c3a57c7af87da80'
+                    'bd2f92088a8c9dcd4609c06e03395484')
 
 
 def simulate_cli(
