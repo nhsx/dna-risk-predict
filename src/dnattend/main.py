@@ -99,9 +99,11 @@ def predict_cli(
         data.to_csv(out)
     if verify:
         if verifyHash(data):
-            logger.info('Output matches expected hash.')
+            print('Success: output matches expected hash.', file=sys.stderr)
+            return 0
         else:
-            logger.error('Output does NOT match expected hash')
+            print('Error: output does NOT match expected hash', file=sys.stderr)
+            return 1
 
 
 def verifyHash(df: str, readSize: int = 4096):
