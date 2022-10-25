@@ -49,6 +49,9 @@ setup(
         'scikit-learn',
         'category-encoders'
     ],
+    extras_require={
+        'shap': ['shap'],
+    },
     license='MIT',
     classifiers=[
         'Development Status :: 1 - Planning',
