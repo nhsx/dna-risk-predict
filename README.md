@@ -8,6 +8,7 @@
 ## Table of contents
 
   * [Installation](#installation)
+    * [Docker](#docker)
   * [Workflow](#workflow)
   * [Usage](#usage)
     * [Generate Example Data](#generate-example-data)
@@ -24,6 +25,23 @@
 
 ```bash
 pip install git+https://github.com/nhsx/dna-risk-predict.git
+```
+
+### Docker
+
+```bash
+git clone --depth 1 https://github.com/nhsx/dna-risk-predict.git
+docker build -t dnattend .
+docker run dnattend --help
+```
+
+To run the following example via Docker we recommended using docker volumes to access local data from the docker container.
+The following command mounts the current directory to the directory `/out` within the container.
+Following this we update the container working directory (`-w /out`) and run the commands as normal.
+
+```bash
+docker run -v $(pwd):/out -w /out \
+  dnattend process config.yaml
 ```
 
 ## Worklow
