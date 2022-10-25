@@ -8,6 +8,9 @@
 ## Table of contents
 
   * [Installation](#installation)
+   * [Virtual Environment](#virtual-environment)
+      * [Unix/macOS](#unixmacos)
+      * [Windows](#windows)
     * [Docker](#docker)
   * [Workflow](#workflow)
   * [Usage](#usage)
@@ -22,10 +25,40 @@
 
 
 ## Installation
+Installation is possible via `pip` as shown below.
+To manage dependencies and avoid conflicts it is recommended to install within a [virtual environment](#virtual-environment) or a [Docker container](#docker) as described.
 
 ```bash
 pip install git+https://github.com/nhsx/dna-risk-predict.git
 ```
+
+
+### Virtual Environment
+
+#### Unix/macOS
+Run the following commands via Terminal.
+
+```bash
+python -m venv dnattend
+source dnattend/bin/activate
+pip install git+https://github.com/nhsx/dna-risk-predict.git
+```
+
+#### Windows
+Run the following commands via PowerShell.
+
+```PowerShell
+py -m venv dnattend
+dnattend/Scripts/Activate.ps1
+pip install git+https://github.com/nhsx/dna-risk-predict.git
+```
+
+If running scripts is disabled on your system then run the following command before activating your environment.
+
+```PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 
 ### Docker
 
@@ -43,6 +76,7 @@ Following this we update the container working directory (`-w /out`) and run the
 docker run -v $(pwd):/out -w /out \
   dnattend process config.yaml
 ```
+
 
 ## Worklow
 
