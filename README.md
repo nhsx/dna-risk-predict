@@ -81,7 +81,7 @@ docker run -v $(pwd):/out -w /out \
 ```
 
 
-## Worklow
+## Workflow
 
 ![workflow](./README_files/DNApredictFlowchart.png)
  <br> *Overview of DNAttend workflow*
