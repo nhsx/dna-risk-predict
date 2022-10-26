@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+!pip install pytest
 import pytest
 from dnattend import main
 
