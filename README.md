@@ -23,6 +23,9 @@
   * [License](#license)
   * [Contact](#contact)
 
+### Built With
+
+[![Python v3.8](https://img.shields.io/badge/python-v3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 
 ## Installation
 Installation is possible via `pip` as shown below.
