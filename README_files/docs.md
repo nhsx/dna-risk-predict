@@ -2,31 +2,34 @@
 
 ## Additional documentation and example visualisations
 
+**Note: This documentation is still a work progress and will be updated.**
+
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 ![build: status](https://github.com/nhsx/dna-risk-predict/actions/workflows/tests.yaml/badge.svg)
 
 ## Table of contents
 
   * [Workflow](#workflow)
-  * [Evaluate Model](#evaluate-model)
+  * [Model Evaluation](#model-evaluation)
       * [Feature Importance](#feature-importance)
       * [ROC Curve](#roc-curve)
       * [Precision-Recall Curve](#precision-recall-curve)
       * [Calibration Curve](#calibration-curve)
       * [Evaluation Report](#evaluation-report)
-    * [Refit Model with All Data](#refit-model-with-all-data)
-  * [Generate Predictions](#generate-predictions)
-  * [Contributing](#contributing)
-  * [License](#license)
-  * [Contact](#contact)
 
 
 ## Worklow
+DNAttend trains two models independently; a baseline logistic regression model and a CatBoost model.
+The CatBoost model is trained via a cross-validated randomised hyper-parameter search with over-fit detection.
+In addition, over-fit detection is performed using a holdout validation set to determine the optimal boosting iterations.
+Output probability of both models are calibrated via cross-validation.
+Finally, decision thresholds are tuned, using the training dataset, to optimise either the ROC or F1 score.
+This choice of threshold metric is determined by the `tuneThresholdBy` option of the configuration file (defult = f1).
 
 ![workflow](./DNApredictFlowchart.png)
- <br> *Overview of DNAttend workflow*
+ <br> *Detailed overview of the DNAttend workflow*
 
-### Evaluate Model
+### Model Evaluation
 
 #### Feature Importance
 

@@ -26,7 +26,6 @@
   * [License](#license)
   * [Contact](#contact)
 
-
 ## Installation
 Installation is possible via `pip` as shown below.
 To manage dependencies and avoid conflicts it is recommended to install within a [virtual environment](#virtual-environment) or a [Docker container](#docker) as described.
@@ -34,7 +33,6 @@ To manage dependencies and avoid conflicts it is recommended to install within a
 ```bash
 pip install git+https://github.com/nhsx/dna-risk-predict.git
 ```
-
 
 ### Virtual Environment
 
@@ -62,7 +60,6 @@ If running scripts is disabled on your system then run the following command bef
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-
 ### Docker
 
 ```bash
@@ -80,41 +77,47 @@ docker run -v $(pwd):/out -w /out \
   dnattend process config.yaml
 ```
 
-
 ## Worklow
 Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
 
 ![workflow](./README_files/DNApredictSimpleFlowchart.png)
  <br> *Overview of DNAttend workflow*
 
+## Usage
+The following sections document the built-in example workflow provided.
+It is recommended that users follow this workflow to verify proper installation.
 
 ### Generate Example Data
 The ```simulate``` sub-command generates suitably formatted input data for testing functionality.
 It also writes an example config file in YAML format.
+Both of these output files can serve as templates for building real-world models.
 
 ```bash
 dnattend simulate --config config.yaml > DNAttend-example.csv
 ```
 
-
 ### Train Model
+DNAttend trains two models independently; a baseline logistic regression model and a CatBoost model.
+The baseline model is simple model that acts as reference to assess performance improvements of CatBoost.
+Refer to the [additional documentation](./README_files/docs.md) for further details of the model workflow.
 
 ```bash
 dnattend train config.yaml
 ```
 
-
 ### Evaluate Model
-
+Following initial training, the `dnattend test` command can be used to assess performance of both the logistic regression and CatBoost models against the hold-out testing data set.
 Refer to the [additional documentation](./README_files/docs.md) for example output visualisation and performance metrics.
 
 ```bash
 dnattend test config.yaml
 ```
 
-
 ### Refit Model with All Data
-Following parameterisation, decision threshold tuning and validation the `retrain` module can be used to refit a new model on the whole data set.
+The previous steps have trained two models: a baseline logistic regression model and a more advanced CatBoost.
+Following parameterisation and assessment of model performance, a final model can be retrained using the entire data set.
+The user may build a logistic regression or CatBoost model depending on the performance metrics.
+This choice must be specified by the user in the `finalModel:` option of the configuration file.
 
 ```bash
 dnattend retrain config.yaml
@@ -132,14 +135,13 @@ dnattend predict --verify DNAttend-example.csv catboost-final.pkl > FinalPredict
 
 **Note: the `--verify` flag is only required when running the example workflow ([see below](#example-data-verifcation)).**
 
-
 ## Example Workflow Verification
 Following initial installation, it is recommended that users run the example workflow, as described, to verify that the pipeline is functioning as expected.
 The `--verify` flag of `dnattend predict`, as shown above, will check the results against the expected output and notify the user if the output matches or not.
 
-
 ## Configuration
-The `dnattend simulate` command writes an example documented configuration file that the user can use a template.
+DNAttend utilises a single configuration file, in YAML, which documents all model parameter and ensure reproducibility of the analysis.
+The `dnattend simulate` command writes an example documented configuration file that the user can use as a template.
 A copy of this file is shown below and available to download [here](./README_files/config.yaml).
 
 ```YAML
@@ -170,10 +172,8 @@ earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
 seed: 42                       # Seed to ensure workflow reproducibility.
 ```
 
-
 ## Further Documentation
 Refer to the [additional documentation](./README_files/docs.md) for further technical details of the modeling framework and visualisations from the example data set.
-
 
 ### Contributing
 
