@@ -107,6 +107,7 @@ def executeCommand(args):
     # Initialise logging
     logFormat = '%(asctime)s - %(levelname)s - %(funcName)s - %(message)s'
     logging.basicConfig(level=args.verbose, format=logFormat)
+    logging.captureWarnings(True)
     del args.verbose, args.command
     # Pop main function and excute script
     function = args.__dict__.pop('function')
