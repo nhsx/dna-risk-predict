@@ -11,7 +11,7 @@
    * [Virtual Environment](#virtual-environment)
       * [Unix/macOS](#unixmacos)
       * [Windows](#windows)
-    * [Docker](#docker)
+   * [Docker](#docker)
   * [Workflow](#workflow)
   * [Usage](#usage)
     * [Generate Example Data](#generate-example-data)
