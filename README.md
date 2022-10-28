@@ -78,10 +78,11 @@ docker run -v $(pwd):/out -w /out \
 ```
 
 ## Worklow
-Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
 
 ![workflow](./README_files/DNApredictSimpleFlowchart.png)
  <br> *Overview of DNAttend workflow*
+
+Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
 
 ## Usage
 The following sections document the built-in example workflow provided.
