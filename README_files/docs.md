@@ -1,19 +1,14 @@
 # DNAttend - ML framework for predicting patient non-attendance
 
-## Train, test and validate a CatBoost Classifier for predicting patient non-attendance (DNA)
+## Additional documentation and example visualisations
 
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 ![build: status](https://github.com/nhsx/dna-risk-predict/actions/workflows/tests.yaml/badge.svg)
 
 ## Table of contents
 
-  * [Installation](#installation)
   * [Workflow](#workflow)
-  * [Usage](#usage)
-    * [Generate Example Data](#generate-example-data)
-    * [Split Data (Test, Train, Validation)](#split-data-test-train-validation)
-    * [Train Model](#train-model)
-    * [Evaluate Model](#evaluate-model)
+  * [Evaluate Model](#evaluate-model)
       * [Feature Importance](#feature-importance)
       * [ROC Curve](#roc-curve)
       * [Precision-Recall Curve](#precision-recall-curve)
@@ -26,68 +21,10 @@
   * [Contact](#contact)
 
 
-## Installation
-
-```bash
-pip install git+https://github.com/nhsx/dna-risk-predict.git
-```
-
 ## Worklow
 
-![workflow](./README_files/DNApredictFlowchart.png)
+![workflow](./DNApredictFlowchart.png)
  <br> *Overview of DNAttend workflow*
-
-
-### Generate Example Data
-The ```simulate``` sub-command generates suitably formatted input data for testing functionality.
-It also writes an example config file in YAML format.
-
-```bash
-dnattend simulate --config config.yaml > DNAttend-example.csv
-```
-
-### Train a model
-
-```bash
-dnattend train config.yaml
-```
-
-### Train Model
-
-```python
-catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
-boolCols = ['firstAppointment']
-numericCols = ['age']
-
-trainingParams = ({
-    'catCols':             catCols,
-    'boolCols':            boolCols,
-    'numericCols':         numericCols,
-    'tuneThresholdBy':     'f1',
-    'cvFolds':             5,
-    'catboostIterations':  100,
-    'hypertuneIterations': 5,
-    'evalIterations':      10_000,
-    'earlyStoppingRounds': 10,
-    'seed':                42
-})
-```
-
-```python
-# Optional - define estimator hyper-parameter search space
-hyperParams = ({
-    'estimator__depth':           randint(4, 10),
-    'estimator__l2_leaf_reg':     randint(2, 10),
-    'estimator__random_strength': uniform.rvs(0, 10, size=100),
-})
-```
-
-```python
-models = train.trainModel(data, hyperParams=hyperParams, **trainingParams)
-```
-
-![model](./README_files/modelWorkflow.png)
- <br> *Summary of DNAttend CatBoost Pipeline*
 
 ### Evaluate Model
 
@@ -99,7 +36,7 @@ fig = featureImportances.plot.barh()
 fig.figure.savefig('featureImportances.png')
 ```
 
-![featureImportance](./README_files/featureImportances.pdf)
+![featureImportance](./featureImportances.pdf)
  <br> *Feature Importances.*
 
 #### ROC Curve
@@ -109,7 +46,7 @@ fig, ax = test.plotROC(models, data)
 fig.figure.savefig('ROCcurve.png')
 ```
 
-![ROC](./README_files/ROCcurve.png)
+![ROC](./ROCcurve.png)
  <br> *Receiver Operating Characteristic curve for both CatBoost and Logistic Model.*
 
 #### Precision-Recall Curve
@@ -119,7 +56,7 @@ fig, ax = test.plotPrecisionRecall(models, data)
 fig.figure.savefig('PRcurve.png', dpi=300)
 ```
 
-![ROC](./README_files/PRcurve.png)
+![ROC](./PRcurve.png)
  <br> *Precision-Recall curve for both CatBoost and Logistic Model.*
 
 #### Calibration Curve
@@ -129,7 +66,7 @@ fig, ax = test.plotCalibrationCurve(models, data, strategy='quantile')
 fig.figure.savefig('CalibrationCurve.png')
 ```
 
-![ROC](./README_files/CalibrationCurve.png)
+![ROC](./CalibrationCurve.png)
  <br> *Calibration curve for both CatBoost and Logistic Model.*
 
 #### Evaluation Report
@@ -168,40 +105,3 @@ print(report)
 }
 
 ```
-
-### Refit Model with All Data
-Following parameterisation, decision threshold tuning and validation the `refitData()` function can be used to refit a new model on the whole data set.
-
-```python
-modelType = 'catboost' # select from catboost or logistic
-finalModel = train.refitData(models[modelType]['model'], data)
-```
-
-### Generate Predictions
-The trained model is now ready to be used.
-Predictions should be made with the `predict()` wrapper function - this ensures the tuned decision threshold is correct applied when assigning classes.
-The output of `predict()` includes the decision class (i.e.`Attend` and `DNA`) and the underlying probabilities of theses classes.
-The output results of this example can be found [here](./README_files/example-data-predictions.csv)
-
-```python
-df[['Attend', 'DNA', 'class']] = test.predict(finalModel, df)
-```
-
-### Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### License
-
-Distributed under the MIT License. _See [LICENSE](./LICENSE) for more information._
-
-### Contact
-
-If you have any other questions please contact the author **[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
-at stephen.richer@proton.me

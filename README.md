@@ -19,6 +19,9 @@
     * [Evaluate Model](#evaluate-model)
     * [Refit Model with All Data](#refit-model-with-all-data)
     * [Generate Predictions](#generate-predictions)
+  * [Example Data Verification](#example-data-verification)
+  * [Configuration](#configuration)
+  * [Further Documentation](#additional-documentation)
   * [Contributing](#contributing)
   * [License](#license)
   * [Contact](#contact)
@@ -79,8 +82,9 @@ docker run -v $(pwd):/out -w /out \
 
 
 ## Worklow
+Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
 
-![workflow](./README_files/DNApredictFlowchart.png)
+![workflow](./README_files/DNApredictSimpleFlowchart.png)
  <br> *Overview of DNAttend workflow*
 
 
@@ -92,17 +96,22 @@ It also writes an example config file in YAML format.
 dnattend simulate --config config.yaml > DNAttend-example.csv
 ```
 
+
 ### Train Model
 
 ```bash
 dnattend train config.yaml
 ```
 
+
 ### Evaluate Model
+
+Refer to the [additional documentation](./README_files/docs.md) for example output visualisation and performance metrics.
 
 ```bash
 dnattend test config.yaml
 ```
+
 
 ### Refit Model with All Data
 Following parameterisation, decision threshold tuning and validation the `retrain` module can be used to refit a new model on the whole data set.
@@ -120,6 +129,51 @@ The output results of this example can be found [here](./README_files/example-da
 ```bash
 dnattend predict --verify DNAttend-example.csv catboost-final.pkl > FinalPredictions.csv
 ```
+
+**Note: the `--verify` flag is only required when running the example workflow ([see below](#example-data-verifcation)).**
+
+
+## Example Workflow Verification
+Following initial installation, it is recommended that users run the example workflow, as described, to verify that the pipeline is functioning as expected.
+The `--verify` flag of `dnattend predict`, as shown above, will check the results against the expected output and notify the user if the output matches or not.
+
+
+## Configuration
+The `dnattend simulate` command writes an example documented configuration file that the user can use a template.
+A copy of this file is shown below and available to download [here](./README_files/config.yaml).
+
+```YAML
+input: DNAttend-example.csv    # Path to input data (Mandatory).
+target: status                 # Column name of target (Mandatory).
+DNAclass: 1                    # Value of target corresponding to DNA.
+out: .                         # Output directory to save results.
+finalModel: catboost           # Method to train final model (catboost or logistic).
+catCols:                       # Column names of categorical features.
+    - day
+    - priority
+    - speciality
+    - consultationMedia
+    - site
+boolCols:                      # Column names of boolean features.
+    - firstAppointment
+numericCols:                   # Column names of numeric features.
+    - age
+train_size: 0.7                # Proportion of data for training.
+test_size: 0.15                # Proportion of data for testing.
+val_size: 0.15                 # Proportion of data for validation.
+tuneThresholdBy: f1            # Metric to tune decision threshold (f1 or roc).
+cvFolds: 5                     # Hyper-tuning cross-validations.
+catboostIterations: 100        # Hyper-tuning CatBoost iterations.
+hypertuneIterations: 5         # Hyper-tuning parameter samples.
+evalIterations: 10_000         # Upper-limit over-fit iterations.
+earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
+seed: 42                       # Seed to ensure workflow reproducibility.
+```
+
+
+## Further Documentation
+Refer to the [additional documentation](./README_files/docs.md) for further technical details of the modeling framework and visualisations from the example data set.
+
 
 ### Contributing
 

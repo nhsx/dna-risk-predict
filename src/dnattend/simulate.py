@@ -72,29 +72,35 @@ def generateData(size: int = 50_000, seed: int = 42,
 
 
 def writeConfig(config: str = None):
-    catCols = ['day', 'priority', 'speciality', 'consultationMedia', 'site']
-    boolCols = ['firstAppointment']
-    numericCols = ['age']
-    config_settings = ({
-        'input': 'DNAttend-example.csv',
-        'finalModel': 'catboost',
-        'target': 'status',
-        'catCols': catCols,
-        'boolCols': boolCols,
-        'numericCols': numericCols,
-        'train_size': 0.7,
-        'test_size': 0.15,
-        'val_size': 0.15,
-        'tuneThresholdBy':     'f1',
-        'cvFolds':             5,
-        'catboostIterations':  100,
-        'hypertuneIterations': 5,
-        'evalIterations':      10_000,
-        'earlyStoppingRounds': 10,
-        'seed':                42
-    })
+    config_settings = (''
+        'input: DNAttend-example.csv    # Path to input data (Mandatory).\n'
+        'target: status                 # Column name of target (Mandatory).\n'
+        'DNAclass: 1                    # Value of target corresponding to DNA.\n'
+        'out: .                         # Output directory to save results.\n'
+        'finalModel: catboost           # Method to train final model (catboost or logistic).\n'
+        'catCols:                       # Column names of categorical features.\n'
+        '    - day\n'
+        '    - priority\n'
+        '    - speciality\n'
+        '    - consultationMedia\n'
+        '    - site\n'
+        'boolCols:                      # Column names of boolean features.\n'
+        '    - firstAppointment\n'
+        'numericCols:                   # Column names of numeric features.\n'
+        '    - age\n'
+        'train_size: 0.7                # Proportion of data for training.\n'
+        'test_size: 0.15                # Proportion of data for testing.\n'
+        'val_size: 0.15                 # Proportion of data for validation.\n'
+        'tuneThresholdBy: f1            # Metric to tune decision threshold (f1 or roc).\n'
+        'cvFolds: 5                     # Hyper-tuning cross-validations.\n'
+        'catboostIterations: 100        # Hyper-tuning CatBoost iterations.\n'
+        'hypertuneIterations: 5         # Hyper-tuning parameter samples.\n'
+        'evalIterations: 10_000         # Upper-limit over-fit iterations.\n'
+        'earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.\n'
+        'seed: 42                       # Seed to ensure workflow reproducibility.\n'
+    )
     if config is None:
-        yaml.dump(config_settings, sys.stderr)
+        sys.stderr.write(config_settings)
     else:
         with open(config, 'w') as fh:
-            yaml.dump(config_settings, fh)
+            fh.write(config_settings)
