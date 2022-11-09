@@ -64,6 +64,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```bash
 git clone --depth 1 https://github.com/nhsx/dna-risk-predict.git
+cd dna-risk-predict/
 docker build -t dnattend .
 docker run dnattend --help
 ```
