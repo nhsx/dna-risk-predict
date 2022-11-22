@@ -21,7 +21,7 @@ def train_cli(config: str):
     # Set global seed
     np.random.seed(config['seed'])
     # Read data and map DNA target label to 1
-    data = pd.read_csv(config['input'])
+    data = pd.read_csv(config['input'], encoding=config['encoding'])
     assert len(data[config['target']].unique()) == 2
     assert config['DNAclass'] in data[config['target']].unique()
     data[config['target']] = data[config['target']].apply(
@@ -89,8 +89,9 @@ def retrain_cli(config: str):
 
 
 def predict_cli(
-        data, model, verify: bool = False, sep: str = ',', out = sys.stdout):
-    data = pd.read_csv(data, sep=sep)
+        data, model, verify: bool = False,
+        encoding: str = 'utf-8', sep: str = ',', out=sys.stdout):
+    data = pd.read_csv(data, encoding=encoding, sep=sep)
     model = joblib.load(model)
     data[['Attend_prob', 'DNA_prob', 'Prediction']] = (
         test.predict(model, data))

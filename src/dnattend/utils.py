@@ -132,6 +132,7 @@ class Config():
             'hypertuneIterations': 5,
             'evalIterations':      10_000,
             'earlyStoppingRounds': 10,
+            'encoding':            'utf-8',
             'seed':                42
         })
 
