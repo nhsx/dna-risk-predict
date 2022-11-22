@@ -31,7 +31,7 @@ Installation is possible via `pip` as shown below.
 To manage dependencies and avoid conflicts it is recommended to install within a [virtual environment](#virtual-environment) or a [Docker container](#docker) as described.
 
 ```bash
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 ### Virtual Environment
@@ -42,7 +42,7 @@ Run the following commands via Terminal.
 ```bash
 python -m venv dnattend
 source dnattend/bin/activate
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 #### Windows
@@ -51,7 +51,7 @@ Run the following commands via PowerShell.
 ```PowerShell
 py -m venv dnattend
 dnattend/Scripts/Activate.ps1
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 If running scripts is disabled on your system then run the following command before activating your environment.
