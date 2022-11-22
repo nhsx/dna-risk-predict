@@ -80,7 +80,7 @@ docker run -v $(pwd):/out -w /out \
 
 ## Worklow
 
-![workflow](./README_files/DNApredictSimpleFlowchart.png)
+![workflow](https://github.com/nhsx/dna-risk-predict/blob/main/README_files/DNApredictSimpleFlowchart.png?raw=true)
  <br> *Overview of DNAttend workflow*
 
 Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
