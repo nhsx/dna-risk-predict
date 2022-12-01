@@ -22,4 +22,5 @@ catboostIterations: 100        # Hyper-tuning CatBoost iterations.
 hypertuneIterations: 5         # Hyper-tuning parameter samples.
 evalIterations: 10_000         # Upper-limit over-fit iterations.
 earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
+encoding: latin-1              # Encoding to use for reading files.
 seed: 42                       # Seed to ensure workflow reproducibility.

@@ -8,7 +8,7 @@
 ## Table of contents
 
   * [Installation](#installation)
-   * [Virtual Environment](#virtual-environment)
+    * [Virtual Environment](#virtual-environment)
       * [Unix/macOS](#unixmacos)
       * [Windows](#windows)
     * [Docker](#docker)
@@ -31,7 +31,7 @@ Installation is possible via `pip` as shown below.
 To manage dependencies and avoid conflicts it is recommended to install within a [virtual environment](#virtual-environment) or a [Docker container](#docker) as described.
 
 ```bash
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 ### Virtual Environment
@@ -42,7 +42,7 @@ Run the following commands via Terminal.
 ```bash
 python -m venv dnattend
 source dnattend/bin/activate
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 #### Windows
@@ -51,7 +51,7 @@ Run the following commands via PowerShell.
 ```PowerShell
 py -m venv dnattend
 dnattend/Scripts/Activate.ps1
-pip install git+https://github.com/nhsx/dna-risk-predict.git
+pip install dnattend
 ```
 
 If running scripts is disabled on your system then run the following command before activating your environment.
@@ -64,6 +64,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ```bash
 git clone --depth 1 https://github.com/nhsx/dna-risk-predict.git
+cd dna-risk-predict/
 docker build -t dnattend .
 docker run dnattend --help
 ```
@@ -79,7 +80,7 @@ docker run -v $(pwd):/out -w /out \
 
 ## Worklow
 
-![workflow](./README_files/DNApredictSimpleFlowchart.png)
+![workflow](https://github.com/nhsx/dna-risk-predict/blob/main/README_files/DNApredictSimpleFlowchart.png?raw=true)
  <br> *Overview of DNAttend workflow*
 
 Refer to the [additional documentation](./README_files/docs.md) for further details of the underlying classifier framework.
@@ -170,6 +171,7 @@ catboostIterations: 100        # Hyper-tuning CatBoost iterations.
 hypertuneIterations: 5         # Hyper-tuning parameter samples.
 evalIterations: 10_000         # Upper-limit over-fit iterations.
 earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
+encoding: latin-1              # Encoding to use for reading files.
 seed: 42                       # Seed to ensure workflow reproducibility.
 ```
 

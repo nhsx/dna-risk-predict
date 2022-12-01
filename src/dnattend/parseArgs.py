@@ -67,7 +67,10 @@ def parseArgs() -> argparse.Namespace:
         'model', help='Trained model in pickl format.')
     sp4.add_argument(
         '--verify', action='store_true',
-        help='Validat output against example hash (default: %(default)s)')
+        help='Validate output against example hash (default: %(default)s)')
+    sp4.add_argument(
+        '--encoding', default='utf-8',
+        help='Encoding to use for UTF when reading (default: %(default)s)')
     sp4.add_argument(
         '--sep', default=',',
         help='Seperator of input dats (default: %(default)s)')
