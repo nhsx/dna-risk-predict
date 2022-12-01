@@ -176,7 +176,8 @@ seed: 42                       # Seed to ensure workflow reproducibility.
 ## Further Documentation
 Refer to the [additional documentation](./README_files/docs.md) for further technical details of the modeling framework and visualisations from the example data set.
 
-### Contributing
+
+## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -186,11 +187,13 @@ Contributions are what make the open source community such an amazing place to l
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### License
+
+## License
 
 Distributed under the MIT License. _See [LICENSE](./LICENSE) for more information._
 
-### Contact
+
+## Contact
 
 If you have any other questions please contact the author **[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
 at stephen.richer@proton.me
