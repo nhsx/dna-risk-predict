@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 _MAJOR_VERSION = '0'
-_MINOR_VERSION = '1'
-_PATCH_VERSION = '3'
+_MINOR_VERSION = '2'
+_PATCH_VERSION = '0'
 
 _VERSION_SUFFIX = None
 
