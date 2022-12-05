@@ -31,8 +31,13 @@ def train_cli(config: str):
     models = train.trainModel(data, **config)
     # Write trained logistic and catboost models and parameter definitions
     for name, model in models.items():
-        joblib.dump(model['model'], f'{config["out"]}/{name}-trained.pkl')
-        with open(f'{config["out"]}/{name}-params.json', 'w') as fh:
+        model_out = f'{config["out"]}/{name}-trained.pkl'
+        params_out = f'{config["out"]}/{name}-params.json'
+        print(f'Writing trained {name} model to: {model_out}', file=sys.stderr)
+        joblib.dump(model['model'], model_out)
+        print(f'Writing tuned {name} parameters '
+              f'to: {params_out}', file=sys.stderr)
+        with open(params_out, 'w') as fh:
             json.dump(model['params'], fh)
     # Write split data
     for name, df in data.items():
@@ -51,22 +56,32 @@ def test_cli(config: str):
         with open(f'{config["out"]}/{name}-params.json') as fh:
             models[name]['params'] = json.load(fh)
 
+    importance_out = f'{config["out"]}/featureImportances.png'
     featureImportances = test.getFeatureImportance(models['catboost']['model'])
+    print(f'Writing feature importances to: {importance_out}', file=sys.stderr)
     fig = featureImportances.plot.barh()
-    fig.figure.savefig(f'{config["out"]}/featureImportances.png', dpi=300)
+    fig.figure.savefig(importance_out, dpi=300)
 
+    roc_out = f'{config["out"]}/ROCcurve.png'
+    print(f'Writing ROC curve to: {roc_out}', file=sys.stderr)
     fig, ax = test.plotROC(models, data)
-    fig.figure.savefig(f'{config["out"]}/ROCcurve.png', dpi=300)
+    fig.figure.savefig(roc_out, dpi=300)
 
+    pr_out = f'{config["out"]}/PRcurve.png'
+    print(f'Writing PR curve to: {pr_out}', file=sys.stderr)
     fig, ax = test.plotPrecisionRecall(models, data)
-    fig.figure.savefig('PRcurve.png', dpi=300)
+    fig.figure.savefig(pr_out, dpi=300)
 
+    calibation_out = f'{config["out"]}/CalibrationCurve.png'
+    print(f'Writing Calibration curve to: {calibation_out}', file=sys.stderr)
     fig, ax = test.plotCalibrationCurve(models, data, strategy='quantile')
-    fig.figure.savefig('CalibrationCurve.png', dpi=300)
+    fig.figure.savefig(calibation_out, dpi=300)
 
     for name in models:
         report = test.evaluate(models[name]['model'], data)
-        with open(f'{config["out"]}/{name}-report.json', 'w') as fh:
+        report_out = f'{config["out"]}/{name}-report.json'
+        print(f'Writing {name} model report to: {report_out}', file=sys.stderr)
+        with open(report_out, 'w') as fh:
             json.dump(report, fh)
 
 
@@ -85,7 +100,10 @@ def retrain_cli(config: str):
     model = joblib.load(
         f'{config["out"]}/{modelType}-trained.pkl')
     model = train.refitData(model, data)
-    joblib.dump(model, f'{config["out"]}/{modelType}-final.pkl')
+    final_out = f'{config["out"]}/{modelType}-final.pkl'
+    print(f'Writing fully trained {modelType} model '
+          f'to: {final_out}', file=sys.stderr)
+    joblib.dump(model, final_out)
 
 
 def predict_cli(
@@ -116,7 +134,6 @@ def verifyHash(df: str, readSize: int = 4096):
             sha256Hash.update(data)
             data = f.read(readSize)
     hash = sha256Hash.hexdigest()
-    os.remove(tf.name)
     return hash == ('801cb98641256aaf8c3a57c7af87da80'
                     'bd2f92088a8c9dcd4609c06e03395484')
 
@@ -130,7 +147,9 @@ def simulate_cli(
     assert noise >= 0
     # Randomly generate some artificial attendance data
     df = simulate.generateData(size, seed, noise)
+    print(f'Writing simulated data to: {out}', file=sys.stderr)
     df.to_csv(out, index=False)
+    print(f'Writing example configuration to: {config}', file=sys.stderr)
     simulate.writeConfig(config)
 
 
