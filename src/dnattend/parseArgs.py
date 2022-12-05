@@ -83,6 +83,7 @@ def parseArgs() -> argparse.Namespace:
         help='Simulate test data.',
         parents=[baseParser],
         epilog=parser.epilog)
+    sp5.add_argument('out', help='Path to write simulated data.')
     sp5.add_argument(
         '--config',
         help='Path to write default config file (default: stderr)')

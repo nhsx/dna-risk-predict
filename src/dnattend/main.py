@@ -123,8 +123,8 @@ def verifyHash(df: str, readSize: int = 4096):
 
 
 def simulate_cli(
-        config: str, size: int = 50_000,
-        noise: float = 0.2, seed: int = 42, out=sys.stdout):
+        out: str, config: str, size: int = 50_000,
+        noise: float = 0.2, seed: int = 42):
     """ Randomly generate some example data """
     assert seed > 0
     assert size > 0

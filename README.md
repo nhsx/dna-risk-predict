@@ -95,7 +95,7 @@ It also writes an example config file in YAML format.
 Both of these output files can serve as templates for building real-world models.
 
 ```bash
-dnattend simulate --config config.yaml > DNAttend-example.csv
+dnattend simulate --config config.yaml DNAttend-example.csv
 ```
 
 ### Train Model
