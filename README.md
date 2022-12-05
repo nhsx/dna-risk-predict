@@ -36,9 +36,7 @@ Windows
 py -m pip install dnattend
 ```
 
-<details>
-<summary><strong><font size="+0.5">Install within a Virtual Environment (optional)</font></strong></summary>
-
+#### Install within a Virtual Environment (optional)
 <details>
 <summary><strong>Unix/macOS</strong></summary>
 
@@ -64,7 +62,7 @@ If running scripts is disabled on your system then run the following command bef
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 </details>
-</details>
+
 
 ## Worklow
 
