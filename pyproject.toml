@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'dnattend'
+version = "0.2.2"
+authors = [
+  {email = "stephen.richer@proton.me"},
+  {name = "Stephen Richer"}
+]
+description = 'AutoML classifier for predicting patient non-attendance (DNA)'
+readme = 'README.md'
+requires-python = ">=3.7"
+keywords = ['dnattend']
+license = {file = "LICENSE"}
+classifiers=[
+    'Natural Language :: English',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Healthcare Industry',
+    'Development Status :: 1 - Planning',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
+dependencies = [
+    'scipy',
+    'numpy',
+    'pyyaml',
+    'pandas',
+    'joblib',
+    'seaborn',
+    'catboost',
+    'matplotlib',
+    'scikit-learn',
+    'category-encoders'
+]
+[project.optional-dependencies]
+shap = [
+    'shap'
+]
+
+[project.urls]
+repository = 'https://github.com/nhsx/dna-risk-predict'
+
+[project.scripts]
+dnattend = "dnattend.cli:parseArgs"
