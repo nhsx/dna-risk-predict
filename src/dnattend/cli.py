@@ -6,8 +6,8 @@ import sys
 import logging
 import argparse
 from timeit import default_timer as timer
+from . import __version__
 from .main import train_cli, test_cli, retrain_cli, predict_cli, simulate_cli
-from ._version import __version__
 
 
 def parseArgs() -> argparse.Namespace:
@@ -68,9 +68,6 @@ def parseArgs() -> argparse.Namespace:
     sp4.add_argument(
         '--verify', action='store_true',
         help='Validate output against example hash (default: %(default)s)')
-    sp4.add_argument(
-        '--encoding', default='utf-8',
-        help='Encoding to use for UTF when reading (default: %(default)s)')
     sp4.add_argument(
         '--sep', default=',',
         help='Seperator of input dats (default: %(default)s)')

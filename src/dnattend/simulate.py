@@ -97,7 +97,6 @@ def writeConfig(config: str = None):
         'hypertuneIterations: 5         # Hyper-tuning parameter samples.\n'
         'evalIterations: 10_000         # Upper-limit over-fit iterations.\n'
         'earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.\n'
-        'encoding: latin-1              # Encoding to use for reading files.\n'
         'seed: 42                       # Seed to ensure workflow reproducibility.\n'
     )
     if config is None:

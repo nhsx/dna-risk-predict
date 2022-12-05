@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
-from . import main
-from . import _version
-from . import parseArgs
+from importlib.metadata import version
+
+
+__version__ = version('dnattend')

@@ -8,10 +8,6 @@
 ## Table of contents
 
   * [Installation](#installation)
-    * [Virtual Environment](#virtual-environment)
-      * [Unix/macOS](#unixmacos)
-      * [Windows](#windows)
-    * [Docker](#docker)
   * [Workflow](#workflow)
   * [Usage](#usage)
     * [Generate Example Data](#generate-example-data)
@@ -26,57 +22,49 @@
   * [License](#license)
   * [Contact](#contact)
 
+
 ## Installation
 Installation is possible via `pip` as shown below.
-To manage dependencies and avoid conflicts it is recommended to install within a [virtual environment](#virtual-environment) or a [Docker container](#docker) as described.
 
+Unix/macOS
 ```bash
-pip install dnattend
+python3 -m pip install dnattend
 ```
 
-### Virtual Environment
+Windows
+```bash
+py -m pip install dnattend
+```
 
-#### Unix/macOS
-Run the following commands via Terminal.
+<details>
+<summary><strong><font size="+0.5">Install within a Virtual Environment (optional)</font></strong></summary>
+
+<details>
+<summary><strong>Unix/macOS</strong></summary>
 
 ```bash
 python -m venv dnattend
 source dnattend/bin/activate
-pip install dnattend
+python3 -m pip install dnattend
 ```
+</details>
 
-#### Windows
-Run the following commands via PowerShell.
+<details>
+<summary><strong>Windows</strong></summary>
 
-```PowerShell
+```bash
 py -m venv dnattend
 dnattend/Scripts/Activate.ps1
-pip install dnattend
+py -m pip install dnattend
 ```
 
 If running scripts is disabled on your system then run the following command before activating your environment.
 
-```PowerShell
+```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-
-### Docker
-
-```bash
-git clone --depth 1 https://github.com/nhsx/dna-risk-predict.git
-cd dna-risk-predict/
-docker build -t dnattend .
-docker run dnattend --help
-```
-
-To run the following example via Docker we recommended using docker volumes to access local data from the docker container.
-The following command mounts the current directory to the directory `/out` within the container.
-Following this we update the container working directory (`-w /out`) and run the commands as normal.
-
-```bash
-docker run -v $(pwd):/out -w /out \
-  dnattend process config.yaml
-```
+</details>
+</details>
 
 ## Worklow
 
@@ -171,16 +159,15 @@ catboostIterations: 100        # Hyper-tuning CatBoost iterations.
 hypertuneIterations: 5         # Hyper-tuning parameter samples.
 evalIterations: 10_000         # Upper-limit over-fit iterations.
 earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
-encoding: latin-1              # Encoding to use for reading files.
 seed: 42                       # Seed to ensure workflow reproducibility.
 ```
+
 
 ## Further Documentation
 Refer to the [additional documentation](./README_files/docs.md) for further technical details of the modeling framework and visualisations from the example data set.
 
 
 ## Contributing
-
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
@@ -191,11 +178,8 @@ Contributions are what make the open source community such an amazing place to l
 
 
 ## License
-
 Distributed under the MIT License. _See [LICENSE](./LICENSE) for more information._
 
 
-## Contact
-
-If you have any other questions please contact the author **[Stephen Richer](https://www.linkedin.com/in/stephenricher/)**
-at stephen.richer@proton.me
+### Contact
+If you have any other questions please contact the author, [Stephen Richer](mailto:stephen.richer@proton.me?subject=[GitHub]%20dnattend).
