@@ -1,11 +1,10 @@
-name: build
+name: build-static
 
 on: [push]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
@@ -19,7 +18,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install DNAttend
+      - name: Install Package
         run: |
             pip install pytest
             pip install ${{ matrix.install-method }}
