@@ -12,8 +12,8 @@ jobs:
 
       - name: Parse matrix
         run: |
-          JSON=$(cat ./.github/workflows/matrix.json)
-          echo "::set-output name=matrix::${JSON//'%'/'%25'}"
+          JSON=$(cat ./.github/workflows/matrix.json | tr '\n\r' ' ')
+          echo "matrix=${JSON}" >> $GITHUB_OUTPUT
   build:
     needs: parse-matrix
     runs-on: ${{ matrix.os }}
