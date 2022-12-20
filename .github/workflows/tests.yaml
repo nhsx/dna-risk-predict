@@ -12,7 +12,7 @@ jobs:
 
       - name: Parse matrix
         run: |
-          echo "matrix=$(jq -c . < .github/workflows/matrix.json) >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c . < .github/workflows/matrix.json)" >> $GITHUB_OUTPUT
   build:
     needs: parse-matrix
     runs-on: ${{ matrix.os }}
