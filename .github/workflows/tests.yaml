@@ -8,10 +8,11 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-    - uses: actions/checkout@v3
-      run: |
-        JSON=$(cat ./.github/workflows/matrix.json)
-        echo "::set-output name=matrix::${JSON//'%'/'%25'}"
+      - uses: actions/checkout@v3
+
+        run: |
+          JSON=$(cat ./.github/workflows/matrix.json)
+          echo "::set-output name=matrix::${JSON//'%'/'%25'}"
   build:
     needs: parse-matrix
     runs-on: ${{ matrix.os }}
