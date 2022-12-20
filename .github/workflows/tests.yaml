@@ -10,6 +10,7 @@ jobs:
       matrix:
         python-version: ['3.8', '3.9', '3.10']
         os: [ubuntu-latest, windows-latest]
+        install-method: [".", "-r requirements.txt"]
     steps:
       - uses: actions/checkout@v3
 
@@ -21,7 +22,7 @@ jobs:
       - name: Install DNAttend
         run: |
             pip install pytest
-            pip install .
+            pip install ${{ matrix.install-method }}
             pip freeze
 
       - name: Run tests
