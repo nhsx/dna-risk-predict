@@ -5,6 +5,10 @@
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 ![build: status](https://github.com/nhsx/dna-risk-predict/actions/workflows/tests.yaml/badge.svg)
 
+**This model is not currently suitable for predicting patient non-attendance in a real-world healthcare environment.**
+
+**Note**: _All example data used in this repository is simulated and for illustrative purposes only._
+
 ## Table of contents
 
   * [Installation](#installation)
