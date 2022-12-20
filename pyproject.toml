@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = 'dnattend'
-version = "0.2.3"
+version = "0.2.4"
 authors = [
   {email = "stephen.richer@proton.me"},
   {name = "Stephen Richer"}
@@ -36,7 +36,7 @@ dependencies = [
     'seaborn',
     'catboost',
     'matplotlib',
-    'scikit-learn',
+    'scikit-learn>=1.20',
     'category-encoders'
 ]
 [project.optional-dependencies]

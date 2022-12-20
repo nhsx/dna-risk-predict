@@ -117,8 +117,10 @@ def trainModel(
                 verbose, nJobs)
         else:
             model, params = _trainLogistic(data, catCols, numericCols, boolCols)
+        print(params)
         params = _fixParams(params)
         model = _rebuildPipeline(model, mode)
+
         _ = model.set_params(**params)
         model = refitData(model, data, noTest=True)
 
@@ -252,7 +254,7 @@ def _fixParams(params: dict):
     newParams = {}
     for param, val in params.items():
         if param.startswith('estimator__'):
-            param = 'estimator__base_estimator' + param[9:]
+            param = 'estimator__estimator' + param[9:]
         newParams[param] = val
     return newParams
 
