@@ -22,6 +22,7 @@ jobs:
         run: |
             pip install pytest
             pip install .
+            pip freeze
 
       - name: Run tests
         run: python -m pytest .
