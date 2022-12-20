@@ -8,7 +8,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-    - id: set-matrix
+    - uses: actions/checkout@v3
       run: |
         JSON=$(cat ./.github/workflows/matrix.json)
         echo "::set-output name=matrix::${JSON//'%'/'%25'}"
