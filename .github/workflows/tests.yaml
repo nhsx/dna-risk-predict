@@ -1,15 +1,22 @@
-name: build-static
+name: build
 
 on: [push]
 
 jobs:
+  parse-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - id: set-matrix
+      run: |
+        JSON=$(cat ./.github/workflows/matrix.json)
+        echo "::set-output name=matrix::${JSON//'%'/'%25'}"
   build:
+    needs: parse-matrix
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-        os: [ubuntu-latest, windows-latest]
-        install-method: [".", "-r requirements.txt"]
+      matrix: ${{fromJson(needs.parse-matrix.outputs.matrix)}}
     steps:
       - uses: actions/checkout@v3
 
