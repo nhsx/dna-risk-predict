@@ -1,37 +1,43 @@
 name: build
 
-on: [push]
+on:
+    push:
+    pull_request:
+    schedule:
+        - cron: "0 8 * * 1"
 
 jobs:
-  parse-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v3
+    parse-matrix:
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.set-matrix.outputs.matrix }}
+        steps:
+            - uses: actions/checkout@v3
 
       - name: Parse matrix
         id: set-matrix
         run: |
-          echo "matrix=$(jq -c . < .github/workflows/matrix.json)" >> $GITHUB_OUTPUT
-  build:
-    needs: parse-matrix
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix: ${{fromJson(needs.parse-matrix.outputs.matrix)}}
-    steps:
-      - uses: actions/checkout@v3
+            matrix=$(jq -c . < .github/workflows/matrix.json)
+            echo "matrix=${matrix}" >> $GITHUB_OUTPUT
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+    build:
+        needs: parse-matrix
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix: ${{fromJson(needs.parse-matrix.outputs.matrix)}}
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Install Package
-        run: |
-            pip install pytest
-            pip install .
-            pip freeze
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v4
+              with:
+                  python-version: ${{ matrix.python-version }}
 
-      - name: Run tests
-        run: python -m pytest .
+            - name: Install Package
+              run: |
+                pip install pytest
+                pip install .
+                pip freeze
+
+            - name: Run tests
+              run: python -m pytest .
