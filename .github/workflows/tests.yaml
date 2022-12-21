@@ -14,11 +14,11 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-      - name: Parse matrix
-        id: set-matrix
-        run: |
-            matrix=$(jq -c . < .github/workflows/matrix.json)
-            echo "matrix=${matrix}" >> $GITHUB_OUTPUT
+            - name: Parse matrix
+              id: set-matrix
+              run: |
+                matrix=$(jq -c . < .github/workflows/matrix.json)
+                echo "matrix=${matrix}" >> $GITHUB_OUTPUT
 
     build:
         needs: parse-matrix
