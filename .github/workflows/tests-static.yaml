@@ -1,4 +1,4 @@
-name: build
+name: build-static
 
 on:
   push:
@@ -34,11 +34,19 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
 
+            - name: Check file existence
+              id: check_files
+              uses: andstor/file-existence-action@v2
+              with:
+                  files: "requirements.txt"
+
             - name: Install Package (fixed requirements)
+              if: steps.check_files.outputs.files_exists == 'true'
               run: |
                 pip install pytest
                 pip install -r requirements.txt
                 pip freeze
 
             - name: Run tests
+              if: steps.check_files.outputs.files_exists == 'true'
               run: python -m pytest .
