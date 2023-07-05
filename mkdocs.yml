@@ -1,0 +1,10 @@
+site_name: DNAttend
+site_url: https://nhsengland.github.io/DNAttend
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Output Evaluation: evaluation.md
+  - Contact: contact.md
+theme: 
+  name: material
+  logo: assets/simulation_badge_M.png
