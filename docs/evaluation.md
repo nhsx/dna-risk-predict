@@ -8,7 +8,7 @@ fig.figure.savefig('featureImportances.png')
 
 
 <p align="center">
-    <img src="./assets/featureImportances.png" alt="Feature Importances" width="80%"/>
+    <img src="../assets/featureImportances.png" alt="Feature Importances" width="80%"/>
 </p>
 <br> *Figure 1: Feature Importances.*
 
@@ -20,7 +20,7 @@ fig.figure.savefig('ROCcurve.png')
 ```
 
 <p align="center">
-    <img src="./assets/ROCcurve.png" alt="Receiver Operating Characteristic curve for both CatBoost and Logistic Model" width="80%"/>
+    <img src="../assets/ROCcurve.png" alt="Receiver Operating Characteristic curve for both CatBoost and Logistic Model" width="80%"/>
 </p>
 <br> *Figure 2: Receiver Operating Characteristic curve for both CatBoost and Logistic Model.*
 
@@ -32,7 +32,7 @@ fig.figure.savefig('PRcurve.png', dpi=300)
 ```
 
 <p align="center">
-    <img src="./assets/PRcurve.png" alt="Precision-Recall curve for both CatBoost and Logistic Model" width="80%"/>
+    <img src="../assets/PRcurve.png" alt="Precision-Recall curve for both CatBoost and Logistic Model" width="80%"/>
 </p>
 <br> *Figure 3: Precision-Recall curve for both CatBoost and Logistic Model.*
 
@@ -45,7 +45,7 @@ fig.figure.savefig('CalibrationCurve.png')
 ```
 
 <p align="center">
-    <img src="./assets/CalibrationCurve.png" alt="Calibration curve for both CatBoost and Logistic Model" width="80%"/>
+    <img src="../assets/CalibrationCurve.png" alt="Calibration curve for both CatBoost and Logistic Model" width="80%"/>
 </p>
 <br> *Figure 4: Calibration curve for both CatBoost and Logistic Model.*
 
