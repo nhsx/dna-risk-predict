@@ -18,7 +18,7 @@ Finally, decision thresholds are tuned, using the training dataset, to optimise 
 This choice of threshold metric is determined by the `tuneThresholdBy` option of the configuration file (defult = f1).
 
 <p align="center">
-    <img src="../assets/DNApredictFlowchart.png" alt="Overview of DNAttend workflow" width="80%"/>
+    <img src="assets/DNApredictFlowchart.png" alt="Overview of DNAttend workflow" width="80%"/>
 </p>
  <br> *Figure: Overview of DNAttend workflow*
 
