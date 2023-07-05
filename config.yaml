@@ -1,0 +1,26 @@
+input: DNAttend-example.csv    # Path to input data (Mandatory).
+target: status                 # Column name of target (Mandatory).
+DNAclass: 1                    # Value of target corresponding to DNA.
+out: .                         # Output directory to save results.
+finalModel: catboost           # Method to train final model (catboost or logistic).
+catCols:                       # Column names of categorical features.
+    - day
+    - priority
+    - speciality
+    - consultationMedia
+    - site
+boolCols:                      # Column names of boolean features.
+    - firstAppointment
+numericCols:                   # Column names of numeric features.
+    - age
+train_size: 0.7                # Proportion of data for training.
+test_size: 0.15                # Proportion of data for testing.
+val_size: 0.15                 # Proportion of data for validation.
+tuneThresholdBy: f1            # Metric to tune decision threshold (f1 or roc).
+cvFolds: 5                     # Hyper-tuning cross-validations.
+catboostIterations: 100        # Hyper-tuning CatBoost iterations.
+hypertuneIterations: 5         # Hyper-tuning parameter samples.
+evalIterations: 10_000         # Upper-limit over-fit iterations.
+earlyStoppingRounds: 10        # Over-fit detection early stopping rounds.
+encoding: latin-1              # Encoding to use for reading files.
+seed: 42                       # Seed to ensure workflow reproducibility.
